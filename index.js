@@ -79,14 +79,19 @@ function commits(gitPath) {
                 var commits = [];
 
                 history.on("commit", function(commit) {
+                    var author = null;
+                    if (!_.isNull(commit.author())) {
+                        author = {
+                            name: commit.author().name(),
+                            email: commit.author().email()
+                        }
+                    }
+                    
                     var commitData = {
                         sha: commit.sha(),
                         date: commit.date(),
                         message: commit.message(),
-                        author: {
-                            name: commit.author().name(),
-                            email: commit.author().email()
-                        }
+                        author: author
                     };
 
                     commits.push(commitData);
