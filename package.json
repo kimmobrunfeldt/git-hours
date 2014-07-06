@@ -1,6 +1,6 @@
 {
   "name": "git-hours",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Calculate time spent on a git repository",
   "main": "index.js",
   "scripts": {
