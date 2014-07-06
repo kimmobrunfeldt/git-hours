@@ -9,7 +9,7 @@ var config = {
     maxCommitDiffInMinutes: 240,
 
     // How many minutes should be added for the first commit of coding session
-    firstCommitAdditionInMinutes: 60
+    firstCommitAdditionInMinutes: 120
 }
 
 function main() {
@@ -21,7 +21,7 @@ function main() {
             }
         };
 
-        console.log(JSON.stringify(work));
+        console.log(JSON.stringify(work, undefined, 2));
     }).catch(function(e) {
         console.error(e.stack);
     });
@@ -50,7 +50,7 @@ function estimateHours(dates) {
         return hours + (config.firstCommitAdditionInMinutes / 60);
     }, 0);
 
-    return hours;
+    return Math.round(hours);
 }
 
 
