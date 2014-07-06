@@ -1,0 +1,32 @@
+{
+  "name": "git-time-spent",
+  "version": "0.0.0",
+  "description": "Calculate time spent on git repository",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kimmobrunfeldt/git-time-spent.git"
+  },
+  "keywords": [
+    "git",
+    "time",
+    "spent",
+    "tracking",
+    "clock"
+  ],
+  "author": "Kimmo Brunfeldt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kimmobrunfeldt/git-time-spent/issues"
+  },
+  "homepage": "https://github.com/kimmobrunfeldt/git-time-spent",
+  "dependencies": {
+    "bluebird": "^2.1.3",
+    "lodash": "^2.4.1",
+    "moment": "^2.7.0",
+    "nodegit": "^0.1.4"
+  }
+}
