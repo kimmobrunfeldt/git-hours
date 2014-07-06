@@ -36,10 +36,14 @@ function estimateHours(dates) {
     }
 
     // Oldest commit first, newest last
-    var sortedDates = dates.sort().reverse();
-    var hours = _.reduce(dates, function(hours, date, index) {
-        var previousDate = dates[index - 1];
-        var diffInMinutes = (date - previousDate) / 1000 / 60;
+    var sortedDates = dates.sort(function(a, b) {
+        return a - b;
+    });
+    var allButLast = _.take(sortedDates, sortedDates.length - 1);
+
+    var hours = _.reduce(allButLast, function(hours, date, index) {
+        var nextDate = sortedDates[index + 1];
+        var diffInMinutes = (nextDate - date) / 1000 / 60;
 
         // Check if commits are counted to be in same coding session
         if (diffInMinutes < config.maxCommitDiffInMinutes) {
