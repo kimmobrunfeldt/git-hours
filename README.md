@@ -6,6 +6,7 @@ Estimate time spent on a git repository.
 
 **Example**
 
+![](docs/screenshots.png)
 
 ## Usage
 
