@@ -11,7 +11,7 @@ var config = {
     maxCommitDiffInMinutes: 240,
 
     // How many minutes should be added for the first commit of coding session
-    firstCommitAdditionInMinutes: 120
+    firstCommitAdditionInMinutes: 240
 };
 
 function main() {
