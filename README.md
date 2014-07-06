@@ -15,7 +15,7 @@ Simply run `githours` in root of a git repository.
 
 ## Install
 
-    npm install -g git-time-spent
+    npm install -g git-hours
 
 You need to install mocha to run tests:
 
