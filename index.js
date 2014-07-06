@@ -10,7 +10,7 @@ var config = {
 
     // How many minutes should be added for the first commit of coding session
     firstCommitAdditionInMinutes: 120
-}
+};
 
 function main() {
     commits('.').then(function(commits) {
@@ -81,7 +81,7 @@ function commits(gitPath) {
                             name: commit.author().name(),
                             email: commit.author().email()
                         }
-                    }
+                    };
 
                     commits.push(commitData);
                 });
