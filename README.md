@@ -10,7 +10,10 @@ Estimate time spent on a git repository.
 
 ## Usage
 
-Simply run `githours` in root of a git repository.
+In root of a git repository run:
+
+    githours
+    
 **Note: repository is not detected if you are not in the root of repository!**
 
 ## Install
