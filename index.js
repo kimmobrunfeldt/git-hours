@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var Promise = require('bluebird');
 var git = require('nodegit');
 var moment = require('moment');
