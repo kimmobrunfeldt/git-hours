@@ -8,12 +8,14 @@ Estimate time spent on a git repository.
 
 ![](docs/screenshot.png)
 
+*Currently only master branch is used to calculate time*
+
 ## Usage
 
 In root of a git repository run:
 
     githours
-    
+
 **Note: repository is not detected if you are not in the root of repository!**
 
 ## Install
