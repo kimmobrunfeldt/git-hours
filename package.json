@@ -7,7 +7,7 @@
     "test": "grunt test"
   },
   "bin": {
-    "shoot": "./index.js"
+    "githours": "./index.js"
   },
   "repository": {
     "type": "git",
