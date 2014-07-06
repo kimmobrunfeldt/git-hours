@@ -1,5 +1,7 @@
 # Git hours
 
+[![Build Status](https://travis-ci.org/kimmobrunfeldt/git-hours.svg)](https://travis-ci.org/kimmobrunfeldt/git-hours)
+
 Estimate time spent on a git repository.
 
 **Example**
