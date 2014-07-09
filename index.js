@@ -74,10 +74,8 @@ function commits(gitPath) {
 
             // Get all commits for all branches
             getBranchNames(gitPath).map(function(branchName) {
-                console.log(branchName);
                 return getBranch(repo, branchName);
             }).map(function(branch) {
-                console.log(branch);
                 return getBranchCommits(branch);
             }).reduce(function(allCommits, branchCommits) {
                 _.each(branchCommits, function(commit) {
@@ -98,14 +96,18 @@ function commits(gitPath) {
 
 function getBranchNames(gitPath) {
     var cmd = "git branch --no-color | awk -F ' +' '! /\(no branch\)/ {print $2}'";
-    return exec(cmd, {cwd: gitPath}).then(function(stdout, stderr) {
-        if (stderr) {
-            throw new Error(stderr);
-        }
+    return new Promise(function(resolve, reject) {
+        exec(cmd, {cwd: gitPath}, function(err, stdout, stderr) {
+            if (err) {
+                reject(err);
+            }
 
-        return stdout
-                .filter(function(e) { return e; })  // Remove empty
-                .map(function(str) { return str.trim(); });  // Trim whitespace
+            resolve(stdout
+                    .split('\n')
+                    .filter(function(e) { return e; })  // Remove empty
+                    .map(function(str) { return str.trim(); })  // Trim whitespace
+            )
+        });
     });
 }
 
