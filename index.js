@@ -84,9 +84,9 @@ function commits(gitPath) {
                         author = {
                             name: commit.author().name(),
                             email: commit.author().email()
-                        }
+                        };
                     }
-                    
+
                     var commitData = {
                         sha: commit.sha(),
                         date: commit.date(),
