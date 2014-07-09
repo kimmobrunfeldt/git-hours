@@ -12,6 +12,7 @@ describe('githours', function() {
                     throw new Error(stderr);
                 }
 
+                console.log('output json', stdout);
                 var work = JSON.parse(stdout);
                 assert.notEqual(work.total.hours.length, 0);
                 assert.notEqual(work.total.commits.length, 0);
