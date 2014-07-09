@@ -95,7 +95,7 @@ function commits(gitPath) {
 }
 
 function getBranchNames(gitPath) {
-    var cmd = "git branch --no-color | awk -F ' +' '! /\(no branch\)/ {print $2}'";
+    var cmd = "git branch --no-color | awk -F ' +' '! /\\(no branch\\)/ {print $2}'";
     return new Promise(function(resolve, reject) {
         exec(cmd, {cwd: gitPath}, function(err, stdout, stderr) {
             if (err) {
@@ -106,7 +106,7 @@ function getBranchNames(gitPath) {
                     .split('\n')
                     .filter(function(e) { return e; })  // Remove empty
                     .map(function(str) { return str.trim(); })  // Trim whitespace
-            )
+            );
         });
     });
 }
@@ -162,7 +162,7 @@ function getBranchCommits(branch) {
         });
 
         history.on("error", function(err) {
-            reject(err)
+            reject(err);
         });
 
         // Start emitting events.
