@@ -20,7 +20,9 @@ In root of a git repository run:
 
 ## Install
 
+    npm install -g nodegit
     npm install -g git-hours
+
 
 You need to install mocha to run tests:
 
