@@ -132,7 +132,7 @@ function commits(gitPath) {
                 branchNames = getBranchNames(gitPath);
             }
 
-            branchNames.map(function(branchName) {
+            Promise.map(branchNames, function(branchName) {
                 return getBranch(repo, branchName);
             }).map(function(branch) {
                 return getBranchCommits(branch);
