@@ -81,7 +81,7 @@ function parseArgs() {
 function mergeDefaultsWithArgs(config) {
     return {
         branches: program.branches || [],
-        maxCommifDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
+        maxCommitDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
         firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes
     };
 }
@@ -111,6 +111,7 @@ function estimateHours(dates) {
         // The work of first commit of a session cannot be seen in git history,
         // so we make a blunt estimate of it
         return hours + (config.firstCommitAdditionInMinutes / 60);
+
     }, 0);
 
     return Math.round(hours);
