@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+var fs = require('fs');
+
 var Promise = require('bluebird');
 var git = require('nodegit');
-var moment = require('moment');
+var program = require('commander');
 var _ = require('lodash');
 
 var exec = Promise.promisify(require('child_process').exec);
@@ -16,8 +18,10 @@ var config = {
     firstCommitAdditionInMinutes: 2 * 60
 };
 
-
 function main() {
+    parseArgs();
+    config = mergeDefaultsWithArgs(config);
+
     commits('.').then(function(commits) {
         var work = {
             total: {
@@ -30,6 +34,56 @@ function main() {
     }).catch(function(e) {
         console.error(e.stack);
     });
+}
+
+function parseArgs() {
+    function list(val) {
+        return val.split(',');
+    }
+
+    function int(val) {
+        return parseInt(val, 10);
+    }
+
+    program
+        .version(require('./package.json').version)
+        .usage('[options]')
+        .option('-b, --branches [branches]', 'list of branches to calculate commits from e.g. master,dev', list)
+        .option('-d, --max-commit-diff [max-commit-diff]', 'maximum difference in minutes between commits counted to one session', int)
+        .option('-a, --first-commit-add [first-commit-add]', 'how many minutes first commit of session should add to total', int)
+
+    program.on('--help', function() {
+        console.log('  Examples:');
+        console.log('');
+        console.log('   - Estimate hours of project');
+        console.log('');
+        console.log('       $ githours');
+        console.log('');
+        console.log('   - Estimate hours of development branch');
+        console.log('');
+        console.log('       $ githours --branches development');
+        console.log('');
+        console.log('   - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits');
+        console.log('');
+        console.log('       $ githours --max-commit-diff 240');
+        console.log('');
+        console.log('   - Estimate hours in repository where developer works 5 hours before first commit in day');
+        console.log('');
+        console.log('       $ githours --first-commit-add 300');
+        console.log('');
+        console.log('  For more details, visit https://github.com/kimmobrunfeldt/githours');
+        console.log('');
+    });
+
+    program.parse(process.argv);
+}
+
+function mergeDefaultsWithArgs(config) {
+    return {
+        branches: program.branches || [],
+        maxCommifDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
+        firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes
+    };
 }
 
 // Estimates spent working hours based on commit dates
@@ -72,8 +126,13 @@ function commits(gitPath) {
                 return;
             }
 
-            // Get all commits for all branches
-            getBranchNames(gitPath).map(function(branchName) {
+            var branchNames = config.branches;
+            if (_.isEmpty(branchNames)) {
+                // If no command line parameters set, get all branches
+                branchNames = getBranchNames(gitPath);
+            }
+
+            branchNames.map(function(branchName) {
                 return getBranch(repo, branchName);
             }).map(function(branch) {
                 return getBranchCommits(branch);
