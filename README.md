@@ -36,10 +36,12 @@ Documentation for git-hours developers.
 
 * Commit all changes
 * Run `grunt release`, which will create new tag and publish code to GitHub
-
-    Travis will release newest tag to NPM
-
 * Edit GitHub release notes
+* Release to NPM
+
+    git checkout x.x.x
+    npm publish
+
 
 To see an example how to release minor/major, check https://github.com/geddski/grunt-release
 
