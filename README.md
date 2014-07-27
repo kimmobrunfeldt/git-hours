@@ -20,33 +20,33 @@ Estimate time spent on a git repository.
 
 The algorithm for estimating hours is quite simple.
 
-<br>
+<br><br>
 
 ![](docs/step0.png)
 
 *Go through all commits and compare the difference between
 them in time.*
 
-<br>
+<br><br><br>
 
 ![](docs/step1.png)
 
 *If the difference is smaller or equal then a given threshold, group the commits
 to a same coding session.*
 
-<br>
+<br><br><br>
 
 ![](docs/step2.png)
 
 *If the difference is bigger than a given threshold, the coding session is finished.*
 
-<br>
+<br><br><br>
 
 ![](docs/step3.png)
 
 *To compensate the first commit whose work is unknown, we add extra hours to the coding session.*
 
-<br>
+<br><br><br>
 
 ![](docs/step4.png)
 
