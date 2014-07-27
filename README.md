@@ -6,7 +6,7 @@ Estimate time spent on a git repository.
 
 **Example**
 
-```json
+```javascript
 ➜  git-hours git:(master) githours
 {
   "total": {
@@ -20,30 +20,37 @@ Estimate time spent on a git repository.
 
 The algorithm for estimating hours is quite simple.
 
+<br>
+
 ![](docs/step0.png)
 
-Go through all commits and compare the difference between
-them in time.
+*Go through all commits and compare the difference between
+them in time.*
 
 <br>
 
 ![](docs/step1.png)
 
-If the difference is smaller or equal then a given threshold, group the commits
-to a same coding session.
+*If the difference is smaller or equal then a given threshold, group the commits
+to a same coding session.*
 
 <br>
 
 ![](docs/step2.png)
 
-If the difference is bigger than a given threshold, the coding session is finished.
-To compensate the first commit whose work is unknown, we add extra hours to the coding session.
+*If the difference is bigger than a given threshold, the coding session is finished.*
 
 <br>
 
 ![](docs/step3.png)
 
-This is continued until we have determined all coding sessions.
+*To compensate the first commit whose work is unknown, we add extra hours to the coding session.*
+
+<br>
+
+![](docs/step4.png)
+
+*Continue until we have determined all coding sessions.*
 
 <br>
 
@@ -51,6 +58,8 @@ This is continued until we have determined all coding sessions.
 
     npm install -g nodegit
     npm install -g git-hours
+
+Nodegit library is a bit unstable and might crash randomly.
 
 ## Usage
 
