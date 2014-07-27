@@ -69,9 +69,37 @@ In root of a git repository run:
 
 **Note: repository is not detected if you are not in the root of repository!**
 
-For additional help
+Help
 
-    githours --help
+    Usage: githours [options]
+
+    Options:
+
+      -h, --help                                 output usage information
+      -V, --version                              output the version number
+      -b, --branches [branches]                  list of branches to calculate commits from e.g. master,dev. Default: all local branches
+      -d, --max-commit-diff [max-commit-diff]    maximum difference in minutes between commits counted to one session. Default: 120
+      -a, --first-commit-add [first-commit-add]  how many minutes first commit of session should add to total. Default: 120
+
+    Examples:
+
+     - Estimate hours of project
+
+         $ githours
+
+     - Estimate hours of development branch
+
+         $ githours --branches development
+
+     - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits
+
+         $ githours --max-commit-diff 240
+
+     - Estimate hours in repository where developer works 5 hours before first commit in day
+
+         $ githours --first-commit-add 300
+
+    For more details, visit https://github.com/kimmobrunfeldt/githours
 
 # For contributors
 
