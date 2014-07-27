@@ -4,14 +4,14 @@
 
 Estimate time spent on a git repository.
 
-**Example**
+**For example time spent on Bootstrap**
 
 ```javascript
-➜  git-hours git:(master) githours
+➜  bootstrap git:(master) githours
 {
   "total": {
-    "hours": 16,
-    "commits": 45
+    "hours": 6345,
+    "commits": 9705
   }
 }
 ```
