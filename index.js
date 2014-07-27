@@ -48,9 +48,21 @@ function parseArgs() {
     program
         .version(require('./package.json').version)
         .usage('[options]')
-        .option('-b, --branches [branches]', 'list of branches to calculate commits from e.g. master,dev', list)
-        .option('-d, --max-commit-diff [max-commit-diff]', 'maximum difference in minutes between commits counted to one session', int)
-        .option('-a, --first-commit-add [first-commit-add]', 'how many minutes first commit of session should add to total', int)
+        .option(
+            '-b, --branches [branches]',
+            'list of branches to calculate commits from e.g. master,dev. Default: all local branches',
+            list
+        )
+        .option(
+            '-d, --max-commit-diff [max-commit-diff]',
+            'maximum difference in minutes between commits counted to one session. Default: ' + config.maxCommitDiffInMinutes,
+            int
+        )
+        .option(
+            '-a, --first-commit-add [first-commit-add]',
+            'how many minutes first commit of session should add to total. Default: ' + config.firstCommitAdditionInMinutes,
+            int
+        );
 
     program.on('--help', function() {
         console.log('  Examples:');
