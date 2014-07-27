@@ -6,9 +6,51 @@ Estimate time spent on a git repository.
 
 **Example**
 
-![](docs/screenshot.png)
+```json
+➜  git-hours git:(master) githours
+{
+  "total": {
+    "hours": 16,
+    "commits": 45
+  }
+}
+```
 
-*Currently only master branch is used to calculate time*
+## How it works
+
+The algorithm for estimating hours is quite simple.
+
+![](docs/step0.png)
+
+Go through all commits and compare the difference between
+them in time.
+
+<br>
+
+![](docs/step1.png)
+
+If the difference is smaller or equal then a given threshold, group the commits
+to a same coding session.
+
+<br>
+
+![](docs/step2.png)
+
+If the difference is bigger than a given threshold, the coding session is finished.
+To compensate the first commit whose work is unknown, we add extra hours to the coding session.
+
+<br>
+
+![](docs/step3.png)
+
+This is continued until we have determined all coding sessions.
+
+<br>
+
+## Install
+
+    npm install -g nodegit
+    npm install -g git-hours
 
 ## Usage
 
@@ -18,15 +60,9 @@ In root of a git repository run:
 
 **Note: repository is not detected if you are not in the root of repository!**
 
-## Install
+For additional help
 
-    npm install -g nodegit
-    npm install -g git-hours
-
-
-You need to install mocha to run tests:
-
-    npm install -g mocha grunt-cli
+    githours --help
 
 # For contributors
 
