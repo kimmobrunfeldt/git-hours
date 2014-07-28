@@ -16,6 +16,8 @@ Estimate time spent on a git repository.
 }
 ```
 
+From a person working 8 hours per day, it would take more than 2 years to build bootstrap.
+
 ## How it works
 
 The algorithm for estimating hours is quite simple.
