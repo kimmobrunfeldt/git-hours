@@ -54,6 +54,8 @@ to a same coding session.*
 
 <br>
 
+The algorithm in [~30 lines of code](https://github.com/kimmobrunfeldt/git-hours/blob/master/index.js#L101-L130).
+
 ## Install
 
     npm install -g nodegit
