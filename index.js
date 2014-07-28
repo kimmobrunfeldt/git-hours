@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-
 var Promise = require('bluebird');
-var git = require('nodegit');
 var program = require('commander');
 var _ = require('lodash');
 
+var fs = Promise.promisifyAll(require('fs'));
+var path = require('path');
 var exec = Promise.promisify(require('child_process').exec);
+
+var EXEC_CONCURRENCY = 10;
 
 var config = {
     // Maximum time diff between 2 subsequent commits in minutes which are
@@ -23,12 +24,27 @@ function main() {
     config = mergeDefaultsWithArgs(config);
 
     commits('.').then(function(commits) {
+        var authors = _.uniq(_.pluck(commits, 'author').concat(_.pluck(commits, 'committer')));
+
         var work = {
             total: {
-                hours: estimateHours(_.pluck(commits, 'date')),
+                hours: estimateHours(_.pluck(commits, 'authorDate').concat(_.pluck(commits, 'committerDate'))),
                 commits: commits.length
             }
         };
+
+        authors.forEach(function (author) {
+            var authorCommits = _.filter(commits, function (commit) { return commit.author === author; });
+            var committerCommits = _.filter(commits, function (commit) { return commit.committer === author; });
+            var dates = [].concat(
+                _.pluck(authorCommits, 'authorDate'),
+                _.pluck(committerCommits, 'committerDate'));
+
+            work[author] = {
+                hours: estimateHours(dates),
+                commits: authorCommits.length
+            };
+        });
 
         console.log(JSON.stringify(work, undefined, 2));
     }).catch(function(e) {
@@ -129,117 +145,95 @@ function estimateHours(dates) {
     return Math.round(hours);
 }
 
-// Promisify nodegit's API of getting all commits in repository
+function verifyPack(packIdxFile) {
+    // we have over 10M outputs from big projects!
+    return exec("git verify-pack -v " + packIdxFile, { maxBuffer: 1024 * 1024 * 100 })
+        .then(function (contents) {
+            return contents.toString().match(/^[0-9a-z]{40} commit/mg).map(function (commit) {
+                return commit.substr(0, 40);
+            });
+        });
+}
+
+function getObjects(gitPath) {
+    var objectsPath = path.join(gitPath, ".git", "objects");
+
+    return fs.readdirAsync(objectsPath).then(function (files) {
+        var objectsDirs = files.filter(function (d) { return d.length == 2; });
+
+        var objectsPromises = Promise.all(objectsDirs.map(function (prefix) {
+            return fs.readdirAsync(path.join(objectsPath, prefix))
+                .then(function (suffixes) {
+                    return suffixes.map(function (suffix) { return prefix + suffix; });
+                });
+        }));
+
+        var packs = [];
+
+        if (_.contains(files, 'pack')) {
+            packs = fs.readdirAsync(path.join(objectsPath, 'pack'))
+                .then(function (packFiles) {
+                    packFiles = packFiles
+                        .filter(function (file) { return file.match(/\.idx$/); })
+                        .map(function (file) { return path.join(objectsPath, 'pack', file); });
+                    return Promise.all(packFiles.map(verifyPack));
+                });
+        }
+
+        return Promise.join(objectsPromises, packs, function (o, p) {
+            return _.flatten([o, p]);
+        });
+    });
+}
+
+function parseCommit(commit) {
+    var author, committer;
+    var authorDate, committerDate;
+    var lines = commit.toString().split(/\n/);
+
+    lines.forEach(function (line) {
+        var m;
+
+        // author
+        m = line.match(/^author (.*) (\d+) ([-+]\d+)$/);
+        if (m) {
+            author = m[1];
+            authorDate = new Date(m[2] * 1000);
+            return;
+        }
+
+        // committer
+        m = line.match(/^committer (.*) (\d+) ([-+]\d+)$/);
+        if (m) {
+            committer = m[1];
+            committerDate = new Date(m[2] * 1000);
+            return;
+        }
+    });
+
+    return {
+        author: author,
+        committer: committer,
+        authorDate: authorDate,
+        committerDate: committerDate,
+    };
+}
+
 function commits(gitPath) {
-    // Promisifing nodegit did not work.
-    return new Promise(function(resolve, reject) {
-        git.Repo.open(gitPath, function(err, repo) {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            var branchNames = config.branches;
-            if (_.isEmpty(branchNames)) {
-                // If no command line parameters set, get all branches
-                branchNames = getBranchNames(gitPath);
-            }
-
-            Promise.map(branchNames, function(branchName) {
-                return getBranch(repo, branchName);
-            }).map(function(branch) {
-                return getBranchCommits(branch);
-            }).reduce(function(allCommits, branchCommits) {
-                _.each(branchCommits, function(commit) {
-                    allCommits.push(commit);
-                });
-
-                return allCommits;
-            }, []).then(function(commits) {
-                var uniqueCommits = _.uniq(commits, function(item, key, a) {
-                    return item.sha;
-                });
-
-                resolve(uniqueCommits);
-            }).catch(reject);
-        });
-    });
-}
-
-function getBranchNames(gitPath) {
-    var cmd = "git branch --no-color | awk -F ' +' '! /\\(no branch\\)/ {print $2}'";
-    return new Promise(function(resolve, reject) {
-        exec(cmd, {cwd: gitPath}, function(err, stdout, stderr) {
-            if (err) {
-                reject(err);
-            }
-
-            resolve(stdout
-                    .split('\n')
-                    .filter(function(e) { return e; })  // Remove empty
-                    .map(function(str) { return str.trim(); })  // Trim whitespace
-            );
-        });
-    });
-}
-
-function getBranches(repo, names) {
-    var branches = [];
-    for (var i = 0; i < names.length; ++i) {
-        branches.push(getBranch(repo, names[i]));
-    }
-
-    return Promise.all(branches);
-}
-
-function getBranch(repo, name) {
-    return new Promise(function(resolve, reject) {
-        repo.getBranch(name, function(err, branch) {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            resolve(branch);
-        });
-    });
-}
-
-function getBranchCommits(branch) {
-    return new Promise(function(resolve, reject) {
-        var history = branch.history();
-        var commits = [];
-
-        history.on("commit", function(commit) {
-            var author = null;
-            if (!_.isNull(commit.author())) {
-                author = {
-                    name: commit.author().name(),
-                    email: commit.author().email()
-                };
-            }
-
-            var commitData = {
-                sha: commit.sha(),
-                date: commit.date(),
-                message: commit.message(),
-                author: author
-            };
-
-            commits.push(commitData);
-        });
-
-        history.on("end", function() {
-            resolve(commits);
-        });
-
-        history.on("error", function(err) {
-            reject(err);
-        });
-
-        // Start emitting events.
-        history.start();
-    });
+    return getObjects(gitPath)
+        .filter(function (objectHash) {
+            // This can be done in a single pass with "git cat-file --batch-check, requires providing stdin"
+            return exec('git cat-file -t ' + objectHash).then(function (type) {
+                return type[0].match(/^commit/);
+            });
+        }, { concurrency: EXEC_CONCURRENCY })
+        .then(function (hashes) {
+            return _.chain(hashes).sortBy().uniq(true).value();
+        })
+        .map(function (objectHash) {
+            // This also can be done in a single pass with "git cat-file --batch"
+            return exec('git cat-file -p ' + objectHash).then(parseCommit);
+        }, { concurrency: EXEC_CONCURRENCY });
 }
 
 main();
