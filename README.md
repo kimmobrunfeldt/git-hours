@@ -7,7 +7,7 @@ Estimate time spent on a git repository.
 **For example time spent on [Twitter's Bootstrap](https://github.com/twbs/bootstrap)**
 
 ```javascript
-➜  bootstrap git:(master) githours
+➜  bootstrap git:(master) git-hours
 {
   "total": {
     "hours": 6345,
@@ -69,13 +69,13 @@ Nodegit library is a bit unstable and might crash randomly.
 
 In root of a git repository run:
 
-    githours
+    git-hours
 
 **Note: repository is not detected if you are not in the root of repository!**
 
 Help
 
-    Usage: githours [options]
+    Usage: git-hours [options]
 
     Options:
 
@@ -89,21 +89,21 @@ Help
 
      - Estimate hours of project
 
-         $ githours
+         $ git-hours
 
      - Estimate hours of development branch
 
-         $ githours --branches development
+         $ git-hours --branches development
 
      - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits
 
-         $ githours --max-commit-diff 240
+         $ git-hours --max-commit-diff 240
 
      - Estimate hours in repository where developer works 5 hours before first commit in day
 
-         $ githours --first-commit-add 300
+         $ git-hours --first-commit-add 300
 
-    For more details, visit https://github.com/kimmobrunfeldt/githours
+    For more details, visit https://github.com/kimmobrunfeldt/git-hours
 
 # For contributors
 

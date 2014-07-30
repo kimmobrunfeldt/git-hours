@@ -2,7 +2,7 @@ var _ = require('lodash');
 var assert = require("assert");
 var exec = require('child_process').exec;
 
-describe('githours', function() {
+describe('git-hours', function() {
 
     describe('cli', function() {
 

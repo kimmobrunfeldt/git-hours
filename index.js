@@ -69,21 +69,21 @@ function parseArgs() {
         console.log('');
         console.log('   - Estimate hours of project');
         console.log('');
-        console.log('       $ githours');
+        console.log('       $ git-hours');
         console.log('');
         console.log('   - Estimate hours of development branch');
         console.log('');
-        console.log('       $ githours --branches development');
+        console.log('       $ git-hours --branches development');
         console.log('');
         console.log('   - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits');
         console.log('');
-        console.log('       $ githours --max-commit-diff 240');
+        console.log('       $ git-hours --max-commit-diff 240');
         console.log('');
         console.log('   - Estimate hours in repository where developer works 5 hours before first commit in day');
         console.log('');
-        console.log('       $ githours --first-commit-add 300');
+        console.log('       $ git-hours --first-commit-add 300');
         console.log('');
-        console.log('  For more details, visit https://github.com/kimmobrunfeldt/githours');
+        console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
     });
 
