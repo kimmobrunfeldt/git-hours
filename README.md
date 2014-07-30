@@ -60,16 +60,51 @@ The algorithm in [~30 lines of code](https://github.com/kimmobrunfeldt/git-hours
 
 ## Install
 
-    npm install -g nodegit
-    npm install -g git-hours
+    $ npm install -g nodegit
+    $ npm install -g git-hours
 
 Nodegit library is a bit unstable and might crash randomly.
+
+## Quick setup with Vagrant
+
+[Vagrant](https://docs.vagrantup.com/v2/getting-started/) can be used to automatically
+set up a disposable Virtual Machine with the required environment and install the
+program. 
+
+```
+$ git clone https://github.com/kimmobrunfeldt/git-hours
+$ cd git-hours
+$ vagrant up && vagrant ssh
+```
+
+And that's it, you can now test out git-hours. For example: 
+
+```
+$ git clone https://github.com/twbs/bootstrap
+$ cd bootstrap
+$ git hours
+{
+  "total": {
+    "hours": 6417,
+    "commits": 9779
+  }
+}
+```
+
+Then when you are done playing around you can cleanly
+[remove](https://docs.vagrantup.com/v2/cli/destroy.html) the vm from your
+system by running:
+
+```
+$ exit
+$ vagrant destroy -f
+```
 
 ## Usage
 
 In root of a git repository run:
 
-    git hours
+    $ git hours
 
 **Note: repository is not detected if you are not in the root of repository!**
 
@@ -116,8 +151,8 @@ Documentation for git-hours developers.
 * Edit GitHub release notes
 * Release to NPM
 
-        git checkout x.x.x
-        npm publish
+        $ git checkout x.x.x
+        $ npm publish
 
 
 To see an example how to release minor/major, check https://github.com/geddski/grunt-release
@@ -126,10 +161,10 @@ To see an example how to release minor/major, check https://github.com/geddski/g
 
 Tests can be run with command
 
-    grunt test
+    $ grunt test
 
 or
 
-    npm test
+    $ npm test
 
 You need to have *mocha* installed globally with `npm install -g mocha`.
