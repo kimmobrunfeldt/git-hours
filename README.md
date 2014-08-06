@@ -58,48 +58,6 @@ to a same coding session.*
 
 The algorithm in [~30 lines of code](https://github.com/kimmobrunfeldt/git-hours/blob/master/index.js#L101-L130).
 
-## Install
-
-    $ npm install -g nodegit
-    $ npm install -g git-hours
-
-Nodegit library is a bit unstable and might crash randomly.
-
-## Quick setup with Vagrant
-
-[Vagrant](https://docs.vagrantup.com/v2/getting-started/) can be used to automatically
-set up a disposable Virtual Machine with the required environment and install the
-program. 
-
-```
-$ git clone https://github.com/kimmobrunfeldt/git-hours
-$ cd git-hours
-$ vagrant up && vagrant ssh
-```
-
-And that's it, you can now test out git-hours. For example: 
-
-```
-$ git clone https://github.com/twbs/bootstrap
-$ cd bootstrap
-$ git hours
-{
-  "total": {
-    "hours": 6417,
-    "commits": 9779
-  }
-}
-```
-
-Then when you are done playing around you can cleanly
-[remove](https://docs.vagrantup.com/v2/cli/destroy.html) the vm from your
-system by running:
-
-```
-$ exit
-$ vagrant destroy -f
-```
-
 ## Usage
 
 In root of a git repository run:
@@ -139,6 +97,48 @@ Help
          $ git hours --first-commit-add 300
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
+
+## Install
+
+    $ npm install -g nodegit
+    $ npm install -g git-hours
+
+Nodegit library is a bit unstable and might crash randomly.
+
+## Quick setup with Vagrant
+
+[Vagrant](https://docs.vagrantup.com/v2/getting-started/) can be used to automatically
+set up a disposable Virtual Machine with the required environment and install the
+program.
+
+```
+$ git clone https://github.com/kimmobrunfeldt/git-hours
+$ cd git-hours
+$ vagrant up && vagrant ssh
+```
+
+And that's it, you can now test out git-hours. For example:
+
+```
+$ git clone https://github.com/twbs/bootstrap
+$ cd bootstrap
+$ git hours
+{
+  "total": {
+    "hours": 6417,
+    "commits": 9779
+  }
+}
+```
+
+Then when you are done playing around you can cleanly
+[remove](https://docs.vagrantup.com/v2/cli/destroy.html) the vm from your
+system by running:
+
+```
+$ exit
+$ vagrant destroy -f
+```
 
 # For contributors
 
