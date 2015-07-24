@@ -21,6 +21,25 @@ Estimate time spent on a git repository.
 
 From a person working 8 hours per day, it would take more than 3 years to build Bootstrap.
 
+## Install
+
+    $ npm install -g git-hours
+
+**NOTE: Use node version >=0.12.x.** *You can try to get nodegit working
+with older versions too but 0.12.x was the easiest. With older node versions,
+you might need to `npm install -g nodegit` too.*
+
+`git-hours` depends on [nodegit](https://github.com/nodegit/nodegit).
+It might be a bit tricky to install. If installing git-hours fails for some
+reason, probably it was because nodegit couldn't be installed.
+Check [their documentation](https://github.com/nodegit/nodegit#getting-started) for troubleshooting.
+
+*Nodegit library has been a bit unstable and it might crash randomly.
+They have fixed a lot of issues lately though.*
+
+If the installation is too troublesome, you can try to [install with Vagrant](#install-with-vagrant). It should work out of the box once you get the Vagrant
+correctly installed to your machine.
+
 ## How it works
 
 The algorithm for estimating hours is quite simple. For each author in the commit history, do the following:
@@ -101,15 +120,6 @@ Help
          $ git hours --first-commit-add 300
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
-
-## Install
-
-    $ npm install -g nodegit
-    $ npm install -g git-hours
-
-Nodegit library is a bit unstable and might crash randomly.
-If you have trouble installing node-git as a dependency, you could
-try the vagrant installation.
 
 ## Install with Vagrant
 
