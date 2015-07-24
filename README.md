@@ -9,9 +9,12 @@ Estimate time spent on a git repository.
 ```javascript
 ➜  bootstrap git:(master) git hours
 {
+
+  ...
+
   "total": {
-    "hours": 6345,
-    "commits": 9705
+    "hours": 9959,
+    "commits": 11470
   }
 }
 ```
