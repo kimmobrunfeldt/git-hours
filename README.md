@@ -20,7 +20,7 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 
 ## How it works
 
-The algorithm for estimating hours is quite simple.
+The algorithm for estimating hours is quite simple. For each author in the commit history, do the following:
 
 <br><br>
 
@@ -52,7 +52,8 @@ to a same coding session.*
 
 ![](docs/step4.png)
 
-*Continue until we have determined all coding sessions.*
+*Continue until we have determined all coding sessions and sum the hours
+made by individual authors.*
 
 <br>
 

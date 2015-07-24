@@ -23,11 +23,25 @@ function main() {
     config = mergeDefaultsWithArgs(config);
 
     commits('.').then(function(commits) {
-        var work = {
-            total: {
-                hours: estimateHours(_.pluck(commits, 'date')),
-                commits: commits.length
-            }
+        var work = {};
+
+        var commitsByEmail = _.groupBy(commits, function(commit) {
+            return commit.author.email || 'unknown';
+        });
+        _.each(commitsByEmail, function(authorCommits, authorEmail) {
+            work[authorEmail] = {
+                name: authorCommits[0].author.name,
+                hours: estimateHours(_.pluck(authorCommits, 'date')),
+                commits: authorCommits.length
+            };
+        });
+
+        var totalHours = _.reduce(work, function(sum, authorWork) {
+            return sum + authorWork.hours;
+        }, 0);
+        work.total = {
+            hours: totalHours,
+            commits: commits.length
         };
 
         console.log(JSON.stringify(work, undefined, 2));
@@ -49,11 +63,6 @@ function parseArgs() {
         .version(require('./package.json').version)
         .usage('[options]')
         .option(
-            '-b, --branches [branches]',
-            'list of branches to calculate commits from e.g. master,dev. Default: all local branches',
-            list
-        )
-        .option(
             '-d, --max-commit-diff [max-commit-diff]',
             'maximum difference in minutes between commits counted to one session. Default: ' + config.maxCommitDiffInMinutes,
             int
@@ -70,10 +79,6 @@ function parseArgs() {
         console.log('   - Estimate hours of project');
         console.log('');
         console.log('       $ git hours');
-        console.log('');
-        console.log('   - Estimate hours of development branch');
-        console.log('');
-        console.log('       $ git hours --branches development');
         console.log('');
         console.log('   - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits');
         console.log('');
@@ -92,7 +97,7 @@ function parseArgs() {
 
 function mergeDefaultsWithArgs(config) {
     return {
-        branches: program.branches || [],
+        range: program.range,
         maxCommitDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
         firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes
     };
@@ -131,37 +136,30 @@ function estimateHours(dates) {
 
 // Promisify nodegit's API of getting all commits in repository
 function commits(gitPath) {
-    // Promisifing nodegit did not work.
-    return new Promise(function(resolve, reject) {
-        git.Repo.open(gitPath, function(err, repo) {
-            if (err) {
-                reject(err);
-                return;
-            }
+    return git.Repository.open(gitPath)
+    .then(function(repo) {
+        var branchNames = getBranchNames(gitPath);
 
-            var branchNames = config.branches;
-            if (_.isEmpty(branchNames)) {
-                // If no command line parameters set, get all branches
-                branchNames = getBranchNames(gitPath);
-            }
+        return Promise.map(branchNames, function(branchName) {
+            return getBranchLatestCommit(repo, branchName);
+        })
+        .map(function(branchLatestCommit) {
+            return getBranchCommits(branchLatestCommit);
+        })
+        .reduce(function(allCommits, branchCommits) {
+            _.each(branchCommits, function(commit) {
+                allCommits.push(commit);
+            });
 
-            Promise.map(branchNames, function(branchName) {
-                return getBranch(repo, branchName);
-            }).map(function(branch) {
-                return getBranchCommits(branch);
-            }).reduce(function(allCommits, branchCommits) {
-                _.each(branchCommits, function(commit) {
-                    allCommits.push(commit);
-                });
+            return allCommits;
+        }, [])
+        .then(function(commits) {
+            // Multiple branches might share commits, so take unique
+            var uniqueCommits = _.uniq(commits, function(item, key, a) {
+                return item.sha;
+            });
 
-                return allCommits;
-            }, []).then(function(commits) {
-                var uniqueCommits = _.uniq(commits, function(item, key, a) {
-                    return item.sha;
-                });
-
-                resolve(uniqueCommits);
-            }).catch(reject);
+            return uniqueCommits;
         });
     });
 }
@@ -192,25 +190,20 @@ function getBranches(repo, names) {
     return Promise.all(branches);
 }
 
-function getBranch(repo, name) {
-    return new Promise(function(resolve, reject) {
-        repo.getBranch(name, function(err, branch) {
-            if (err) {
-                reject(err);
-                return;
-            }
+function getBranchLatestCommit(repo, branchName) {
+    var type = git.Reference.TYPE.SYMBOLIC;
 
-            resolve(branch);
-        });
+    return repo.getBranch(branchName).then(function(reference) {
+        return repo.getBranchCommit(reference.name());
     });
 }
 
-function getBranchCommits(branch) {
+function getBranchCommits(branchLatestCommit) {
     return new Promise(function(resolve, reject) {
-        var history = branch.history();
+        var history = branchLatestCommit.history();
         var commits = [];
 
-        history.on("commit", function(commit) {
+        history.on('commit', function(commit) {
             var author = null;
             if (!_.isNull(commit.author())) {
                 author = {
@@ -229,11 +222,11 @@ function getBranchCommits(branch) {
             commits.push(commitData);
         });
 
-        history.on("end", function() {
+        history.on('end', function() {
             resolve(commits);
         });
 
-        history.on("error", function(err) {
+        history.on('error', function(err) {
             reject(err);
         });
 
