@@ -104,8 +104,12 @@ Help
     $ npm install -g git-hours
 
 Nodegit library is a bit unstable and might crash randomly.
+If you have trouble installing node-git as a dependency, you could
+try the vagrant installation.
 
-## Quick setup with Vagrant
+## Install with Vagrant
+
+If you prefer to use vagrant, here's how:
 
 [Vagrant](https://docs.vagrantup.com/v2/getting-started/) can be used to automatically
 set up a disposable Virtual Machine with the required environment and install the
