@@ -93,13 +93,12 @@ In root of a git repository run:
 
 Help
 
-    Usage: git hours [options]
+    Usage: githours [options]
 
     Options:
 
       -h, --help                                 output usage information
       -V, --version                              output the version number
-      -b, --branches [branches]                  list of branches to calculate commits from e.g. master,dev. Default: all local branches
       -d, --max-commit-diff [max-commit-diff]    maximum difference in minutes between commits counted to one session. Default: 120
       -a, --first-commit-add [first-commit-add]  how many minutes first commit of session should add to total. Default: 120
 
@@ -108,10 +107,6 @@ Help
      - Estimate hours of project
 
          $ git hours
-
-     - Estimate hours of development branch
-
-         $ git hours --branches development
 
      - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits
 
@@ -122,6 +117,7 @@ Help
          $ git hours --first-commit-add 300
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
+
 
 ## Install with Vagrant
 
