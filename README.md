@@ -21,6 +21,8 @@ Estimate time spent on a git repository.
 
 From a person working 8 hours per day, it would take more than 3 years to build Bootstrap.
 
+*Please note that the information might not be accurate enough to be used in billing.*
+
 ## Install
 
     $ npm install -g git-hours
