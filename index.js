@@ -23,28 +23,36 @@ function main() {
     config = mergeDefaultsWithArgs(config);
 
     commits('.').then(function(commits) {
-        var work = {};
-
         var commitsByEmail = _.groupBy(commits, function(commit) {
             return commit.author.email || 'unknown';
         });
-        _.each(commitsByEmail, function(authorCommits, authorEmail) {
-            work[authorEmail] = {
+        var authorWorks = _.map(commitsByEmail, function(authorCommits, authorEmail) {
+            return {
+                email: authorEmail,
                 name: authorCommits[0].author.name,
                 hours: estimateHours(_.pluck(authorCommits, 'date')),
                 commits: authorCommits.length
             };
         });
 
-        var totalHours = _.reduce(work, function(sum, authorWork) {
+        // XXX: This relies on the implementation detail that json is printed
+        // in the same order as the keys were added. This is anyway just for
+        // making the output easier to read, so it doesn't matter if it
+        // isn't sorted in some cases.
+        var sortedWork = {};
+        _.each(_.sortBy(authorWorks, 'hours'), function(authorWork) {
+            sortedWork[authorWork.email] = _.omit(authorWork, 'email');
+        });
+
+        var totalHours = _.reduce(sortedWork, function(sum, authorWork) {
             return sum + authorWork.hours;
         }, 0);
-        work.total = {
+        sortedWork.total = {
             hours: totalHours,
             commits: commits.length
         };
 
-        console.log(JSON.stringify(work, undefined, 2));
+        console.log(JSON.stringify(sortedWork, undefined, 2));
     }).catch(function(e) {
         console.error(e.stack);
     });
