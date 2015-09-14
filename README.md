@@ -81,7 +81,7 @@ made by individual authors.*
 
 <br>
 
-The algorithm in [~30 lines of code](https://github.com/kimmobrunfeldt/git-hours/blob/master/index.js#L101-L130).
+The algorithm in [~30 lines of code](https://github.com/kimmobrunfeldt/git-hours/blob/8aaeee237cb9d9028e7a2592a25ad8468b1f45e4/index.js#L114-L143).
 
 ## Usage
 
