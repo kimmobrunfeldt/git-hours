@@ -15,12 +15,17 @@ var config = {
     maxCommitDiffInMinutes: 2 * 60,
 
     // How many minutes should be added for the first commit of coding session
-    firstCommitAdditionInMinutes: 2 * 60
+    firstCommitAdditionInMinutes: 2 * 60,
+
+    //Since data
+    since: '2015-01-01'
 };
 
 function main() {
     parseArgs();
     config = mergeDefaultsWithArgs(config);
+
+    console.log(config.since);
 
     commits('.').then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
@@ -79,6 +84,11 @@ function parseArgs() {
             '-a, --first-commit-add [first-commit-add]',
             'how many minutes first commit of session should add to total. Default: ' + config.firstCommitAdditionInMinutes,
             int
+        )
+        .option(
+            '-s, --since [Since date to analyze]',
+            'Since date to start count hours. Default: ' + config.since,
+            String
         );
 
     program.on('--help', function() {
@@ -107,7 +117,8 @@ function mergeDefaultsWithArgs(config) {
     return {
         range: program.range,
         maxCommitDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
-        firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes
+        firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes,
+        since: program.since || config.since
     };
 }
 
@@ -157,6 +168,7 @@ function commits(gitPath) {
         .reduce(function(allCommits, branchCommits) {
             _.each(branchCommits, function(commit) {
                 allCommits.push(commit);
+                console.log(commit.date);
             });
 
             return allCommits;
@@ -227,7 +239,10 @@ function getBranchCommits(branchLatestCommit) {
                 author: author
             };
 
-            commits.push(commitData);
+            var sinceDate = new Date(config.since);
+            if(commitData.date > sinceDate){
+              commits.push(commitData);
+            }
         });
 
         history.on('end', function() {
