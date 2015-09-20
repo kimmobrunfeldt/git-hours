@@ -121,26 +121,27 @@ function parseArgs() {
 }
 
 function parseSinceDate(options){
+  var justNow, thisPeriod, paramDate;
   switch(options.since){
     case 'tonight':
-      var justNow = new Date();
-      var tonight = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
-      config.since = tonight;
+      justNow = new Date();
+      thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
+      config.since = thisPeriod;
       break;
     case 'yesterday':
-      var justNow = new Date();
-      var tonight = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
-      config.since = tonight;
+      justNow = new Date();
+      thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
+      config.since = thisPeriod;
       break;
     case 'lastweek':
-      var justNow = new Date();
-      var lastweek = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
-      config.since = lastweek;
+      justNow = new Date();
+      thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
+      config.since = thisPeriod;
       break;
     case 'always':
       break;
     default:
-      var paramDate = new Date(String(config.since));
+      paramDate = new Date(String(config.since));
       if(paramDate === undefined){
         config.since = 'always';
       }else{
