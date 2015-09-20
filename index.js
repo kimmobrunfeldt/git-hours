@@ -85,8 +85,8 @@ function parseArgs() {
             int
         )
         .option(
-            '-s, --since [Since date to analyze]',
-            'Since date to start count hours. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: ' + config.since,
+            '-s, --since [since-certain-date]',
+            'Analyze data since certain date. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: ' + config.since,
             String
         );
 
