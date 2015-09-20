@@ -86,7 +86,7 @@ function parseArgs() {
         )
         .option(
             '-s, --since [Since date to analyze]',
-            'Since date to start count hours. Default: ' + config.since,
+            'Since date to start count hours. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: ' + config.since,
             String
         );
 
@@ -104,6 +104,14 @@ function parseArgs() {
         console.log('   - Estimate hours in repository where developer works 5 hours before first commit in day');
         console.log('');
         console.log('       $ git hours --first-commit-add 300');
+        console.log('');
+        console.log('   - Estimate hours work in repository since yesterday');
+        console.log('');
+        console.log('       $ git hours --since yesterday');
+        console.log('');
+        console.log('   - Estimate hours work in repository since 2015-01-31');
+        console.log('');
+        console.log('       $ git hours --since 2015-01-31');
         console.log('');
         console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
