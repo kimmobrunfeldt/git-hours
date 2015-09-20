@@ -18,14 +18,13 @@ var config = {
     firstCommitAdditionInMinutes: 2 * 60,
 
     //Since data
-    since: '2015-01-01'
+    since: 'always'
 };
 
 function main() {
     parseArgs();
     config = mergeDefaultsWithArgs(config);
-
-    console.log(config.since);
+    parseSinceDate(config);
 
     commits('.').then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
@@ -113,6 +112,35 @@ function parseArgs() {
     program.parse(process.argv);
 }
 
+function parseSinceDate(options){
+  switch(options.since){
+    case 'tonight':
+      var justNow = new Date();
+      var tonight = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
+      config.since = tonight;
+      break;
+    case 'yesterday':
+      var justNow = new Date();
+      var tonight = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
+      config.since = tonight;
+      break;
+    case 'lastweek':
+      var justNow = new Date();
+      var lastweek = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
+      config.since = lastweek;
+      break;
+    case 'always':
+      break;
+    default:
+      var paramDate = new Date(String(config.since));
+      if(paramDate === undefined){
+        config.since = 'always';
+      }else{
+        config.since = paramDate;
+      }
+  }
+}
+
 function mergeDefaultsWithArgs(config) {
     return {
         range: program.range,
@@ -168,7 +196,6 @@ function commits(gitPath) {
         .reduce(function(allCommits, branchCommits) {
             _.each(branchCommits, function(commit) {
                 allCommits.push(commit);
-                console.log(commit.date);
             });
 
             return allCommits;
@@ -239,8 +266,7 @@ function getBranchCommits(branchLatestCommit) {
                 author: author
             };
 
-            var sinceDate = new Date(config.since);
-            if(commitData.date > sinceDate){
+            if(commitData.date > config.since || config.since === 'always'){
               commits.push(commitData);
             }
         });
