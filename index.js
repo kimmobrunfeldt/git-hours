@@ -121,33 +121,33 @@ function parseArgs() {
 }
 
 function parseSinceDate(options){
-  var justNow, thisPeriod, paramDate;
-  switch(options.since){
-    case 'tonight':
-      justNow = new Date();
-      thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
-      config.since = thisPeriod;
-      break;
-    case 'yesterday':
-      justNow = new Date();
-      thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
-      config.since = thisPeriod;
-      break;
-    case 'lastweek':
-      justNow = new Date();
-      thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
-      config.since = thisPeriod;
-      break;
-    case 'always':
-      break;
-    default:
-      paramDate = new Date(String(config.since));
-      if(paramDate === undefined){
-        config.since = 'always';
-      }else{
-        config.since = paramDate;
-      }
-  }
+    var justNow, thisPeriod, paramDate;
+    switch(options.since){
+        case 'tonight':
+            justNow = new Date();
+            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
+            config.since = thisPeriod;
+            break;
+        case 'yesterday':
+            justNow = new Date();
+            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
+            config.since = thisPeriod;
+            break;
+        case 'lastweek':
+            justNow = new Date();
+            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
+            config.since = thisPeriod;
+            break;
+        case 'always':
+            break;
+        default:
+            paramDate = new Date(String(config.since));
+            if(paramDate === undefined){
+              config.since = 'always';
+            }else{
+              config.since = paramDate;
+            }
+    }
 }
 
 function mergeDefaultsWithArgs(config) {
@@ -276,7 +276,7 @@ function getBranchCommits(branchLatestCommit) {
             };
 
             if(commitData.date > config.since || config.since === 'always'){
-              commits.push(commitData);
+                commits.push(commitData);
             }
         });
 
