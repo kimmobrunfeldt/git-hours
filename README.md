@@ -27,6 +27,8 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 
     $ npm install -g git-hours
 
+**WARNING: Does not work with node 4.0! See [this issue](https://github.com/nodegit/nodegit/issues/723)**
+
 **NOTE: Use node version >=0.12.x.** *You can try to get nodegit working
 with older versions too but 0.12.x was the easiest. With older node versions,
 you might need to `npm install -g nodegit` too.*
@@ -164,32 +166,3 @@ system by running:
 $ exit
 $ vagrant destroy -f
 ```
-
-# For contributors
-
-Documentation for git-hours developers.
-
-## Release
-
-* Commit all changes
-* Run `grunt release`, which will create new tag and publish code to GitHub
-* Edit GitHub release notes
-* Release to NPM
-
-        $ git checkout x.x.x
-        $ npm publish
-
-
-To see an example how to release minor/major, check https://github.com/geddski/grunt-release
-
-## Test
-
-Tests can be run with command
-
-    $ grunt test
-
-or
-
-    $ npm test
-
-You need to have *mocha* installed globally with `npm install -g mocha`.

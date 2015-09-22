@@ -2,12 +2,9 @@
   "name": "git-hours",
   "version": "1.0.0",
   "description": "Estimate time spent on a git repository",
-  "main": "index.js",
-  "scripts": {
-    "test": "grunt test"
-  },
+  "main": "./src/index.js",
   "bin": {
-    "git-hours": "./index.js"
+    "git-hours": "./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -31,13 +28,19 @@
     "bluebird": "^2.1.3",
     "commander": "^2.2.0",
     "lodash": "^2.4.1",
+    "moment": "^2.10.6",
     "nodegit": "^0.4.1"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.10.0",
-    "grunt-release": "^0.7.0",
-    "grunt-shell": "^0.7.0",
-    "mocha": "^2.2.5"
+    "eslint": "^1.5.1",
+    "jscs": "^2.1.1",
+    "mocha": "^2.3.3",
+    "releasor": "^0.1.3"
+  },
+  "scripts": {
+    "ci": "./tools/ci.sh",
+    "test": "mocha",
+    "eslint": "eslint --ext .js ./src ./test",
+    "jscs": "jscs ./src ./test"
   }
 }

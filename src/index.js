@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-
 var Promise = require('bluebird');
 var git = require('nodegit');
 var program = require('commander');
 var _ = require('lodash');
-
+var moment = require('moment');
 var exec = Promise.promisify(require('child_process').exec);
+
+var DATE_FORMAT = 'YYYY-MM-DD';
 
 var config = {
     // Maximum time diff between 2 subsequent commits in minutes which are
@@ -17,16 +17,16 @@ var config = {
     // How many minutes should be added for the first commit of coding session
     firstCommitAdditionInMinutes: 2 * 60,
 
-    //Since data
+    // Include commits since time x
     since: 'always'
 };
 
 function main() {
     parseArgs();
     config = mergeDefaultsWithArgs(config);
-    parseSinceDate(config);
+    config.since = parseSinceDate(config.since);
 
-    commits('.').then(function(commits) {
+    getCommits('.').then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
             return commit.author.email || 'unknown';
         });
@@ -63,30 +63,29 @@ function main() {
 }
 
 function parseArgs() {
-    function list(val) {
-        return val.split(',');
-    }
-
     function int(val) {
         return parseInt(val, 10);
     }
 
     program
-        .version(require('./package.json').version)
+        .version(require('../package.json').version)
         .usage('[options]')
         .option(
             '-d, --max-commit-diff [max-commit-diff]',
-            'maximum difference in minutes between commits counted to one session. Default: ' + config.maxCommitDiffInMinutes,
+            'maximum difference in minutes between commits counted to one' +
+            ' session. Default: ' + config.maxCommitDiffInMinutes,
             int
         )
         .option(
             '-a, --first-commit-add [first-commit-add]',
-            'how many minutes first commit of session should add to total. Default: ' + config.firstCommitAdditionInMinutes,
+            'how many minutes first commit of session should add to total.' +
+            ' Default: ' + config.firstCommitAdditionInMinutes,
             int
         )
         .option(
             '-s, --since [since-certain-date]',
-            'Analyze data since certain date. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: ' + config.since,
+            'Analyze data since certain date.' +
+            ' [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: ' + config.since,
             String
         );
 
@@ -97,11 +96,13 @@ function parseArgs() {
         console.log('');
         console.log('       $ git hours');
         console.log('');
-        console.log('   - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits');
+        console.log('   - Estimate hours in repository where developers commit' +
+                    ' more seldom: they might have 4h(240min) pause between commits');
         console.log('');
         console.log('       $ git hours --max-commit-diff 240');
         console.log('');
-        console.log('   - Estimate hours in repository where developer works 5 hours before first commit in day');
+        console.log('   - Estimate hours in repository where developer works 5' +
+                    ' hours before first commit in day');
         console.log('');
         console.log('       $ git hours --first-commit-add 300');
         console.log('');
@@ -120,42 +121,30 @@ function parseArgs() {
     program.parse(process.argv);
 }
 
-function parseSinceDate(options){
-    var justNow, thisPeriod, paramDate;
-    switch(options.since){
-        case 'tonight':
-            justNow = new Date();
-            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
-            config.since = thisPeriod;
-            break;
+function parseSinceDate(since) {
+    switch (since) {
+        case 'today':
+            return moment().startOf('day');
         case 'yesterday':
-            justNow = new Date();
-            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
-            config.since = thisPeriod;
-            break;
+            return moment().startOf('day').subtract(1, 'day');
+        case 'thisweek':
+            return moment().startOf('week');
         case 'lastweek':
-            justNow = new Date();
-            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
-            config.since = thisPeriod;
-            break;
+            return moment().startOf('week').subtract(1, 'week');
         case 'always':
-            break;
+            return 'always';
         default:
-            paramDate = new Date(String(config.since));
-            if(paramDate === undefined){
-              config.since = 'always';
-            }else{
-              config.since = paramDate;
-            }
+            // XXX: Moment tries to parse anything, results might be weird
+            return moment(since, DATE_FORMAT);
     }
 }
 
-function mergeDefaultsWithArgs(config) {
+function mergeDefaultsWithArgs(conf) {
     return {
         range: program.range,
-        maxCommitDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
-        firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes,
-        since: program.since || config.since
+        maxCommitDiffInMinutes: program.maxCommitDiff || conf.maxCommitDiffInMinutes,
+        firstCommitAdditionInMinutes: program.firstCommitAdd || conf.firstCommitAdditionInMinutes,
+        since: program.since || conf.since
     };
 }
 
@@ -171,27 +160,27 @@ function estimateHours(dates) {
     });
     var allButLast = _.take(sortedDates, sortedDates.length - 1);
 
-    var hours = _.reduce(allButLast, function(hours, date, index) {
+    var totalHours = _.reduce(allButLast, function(hours, date, index) {
         var nextDate = sortedDates[index + 1];
         var diffInMinutes = (nextDate - date) / 1000 / 60;
 
         // Check if commits are counted to be in same coding session
         if (diffInMinutes < config.maxCommitDiffInMinutes) {
-            return hours + (diffInMinutes / 60);
+            return hours + diffInMinutes / 60;
         }
 
         // The date difference is too big to be inside single coding session
         // The work of first commit of a session cannot be seen in git history,
         // so we make a blunt estimate of it
-        return hours + (config.firstCommitAdditionInMinutes / 60);
+        return hours + config.firstCommitAdditionInMinutes / 60;
 
     }, 0);
 
-    return Math.round(hours);
+    return Math.round(totalHours);
 }
 
 // Promisify nodegit's API of getting all commits in repository
-function commits(gitPath) {
+function getCommits(gitPath) {
     return git.Repository.open(gitPath)
     .then(function(repo) {
         var branchNames = getBranchNames(gitPath);
@@ -237,18 +226,7 @@ function getBranchNames(gitPath) {
     });
 }
 
-function getBranches(repo, names) {
-    var branches = [];
-    for (var i = 0; i < names.length; ++i) {
-        branches.push(getBranch(repo, names[i]));
-    }
-
-    return Promise.all(branches);
-}
-
 function getBranchLatestCommit(repo, branchName) {
-    var type = git.Reference.TYPE.SYMBOLIC;
-
     return repo.getBranch(branchName).then(function(reference) {
         return repo.getBranchCommit(reference.name());
     });
@@ -275,7 +253,8 @@ function getBranchCommits(branchLatestCommit) {
                 author: author
             };
 
-            if(commitData.date > config.since || config.since === 'always'){
+            var sinceAlways = config.since === 'always' || !config.since;
+            if (sinceAlways || moment(commitData.date.toISOString()).isAfter(config.since)) {
                 commits.push(commitData);
             }
         });
