@@ -101,6 +101,7 @@ Help
       -V, --version                              output the version number
       -d, --max-commit-diff [max-commit-diff]    maximum difference in minutes between commits counted to one session. Default: 120
       -a, --first-commit-add [first-commit-add]  how many minutes first commit of session should add to total. Default: 120
+      -s, --since [since-certain-date]           Analyze data since certain date. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: always'
 
     Examples:
 
@@ -115,6 +116,14 @@ Help
      - Estimate hours in repository where developer works 5 hours before first commit in day
 
          $ git hours --first-commit-add 300
+
+     - Estimate hours work in repository since yesterday
+
+       $ git hours --since yesterday
+
+     - Estimate hours work in repository since 2015-01-31
+
+       $ git hours --since 2015-01-31
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
 

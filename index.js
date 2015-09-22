@@ -15,12 +15,16 @@ var config = {
     maxCommitDiffInMinutes: 2 * 60,
 
     // How many minutes should be added for the first commit of coding session
-    firstCommitAdditionInMinutes: 2 * 60
+    firstCommitAdditionInMinutes: 2 * 60,
+
+    //Since data
+    since: 'always'
 };
 
 function main() {
     parseArgs();
     config = mergeDefaultsWithArgs(config);
+    parseSinceDate(config);
 
     commits('.').then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
@@ -79,6 +83,11 @@ function parseArgs() {
             '-a, --first-commit-add [first-commit-add]',
             'how many minutes first commit of session should add to total. Default: ' + config.firstCommitAdditionInMinutes,
             int
+        )
+        .option(
+            '-s, --since [since-certain-date]',
+            'Analyze data since certain date. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: ' + config.since,
+            String
         );
 
     program.on('--help', function() {
@@ -96,6 +105,14 @@ function parseArgs() {
         console.log('');
         console.log('       $ git hours --first-commit-add 300');
         console.log('');
+        console.log('   - Estimate hours work in repository since yesterday');
+        console.log('');
+        console.log('       $ git hours --since yesterday');
+        console.log('');
+        console.log('   - Estimate hours work in repository since 2015-01-31');
+        console.log('');
+        console.log('       $ git hours --since 2015-01-31');
+        console.log('');
         console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
     });
@@ -103,11 +120,42 @@ function parseArgs() {
     program.parse(process.argv);
 }
 
+function parseSinceDate(options){
+    var justNow, thisPeriod, paramDate;
+    switch(options.since){
+        case 'tonight':
+            justNow = new Date();
+            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate());
+            config.since = thisPeriod;
+            break;
+        case 'yesterday':
+            justNow = new Date();
+            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-1);
+            config.since = thisPeriod;
+            break;
+        case 'lastweek':
+            justNow = new Date();
+            thisPeriod = new Date(justNow.getFullYear(), justNow.getMonth(), justNow.getUTCDate()-7);
+            config.since = thisPeriod;
+            break;
+        case 'always':
+            break;
+        default:
+            paramDate = new Date(String(config.since));
+            if(paramDate === undefined){
+              config.since = 'always';
+            }else{
+              config.since = paramDate;
+            }
+    }
+}
+
 function mergeDefaultsWithArgs(config) {
     return {
         range: program.range,
         maxCommitDiffInMinutes: program.maxCommitDiff || config.maxCommitDiffInMinutes,
-        firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes
+        firstCommitAdditionInMinutes: program.firstCommitAdd || config.firstCommitAdditionInMinutes,
+        since: program.since || config.since
     };
 }
 
@@ -227,7 +275,9 @@ function getBranchCommits(branchLatestCommit) {
                 author: author
             };
 
-            commits.push(commitData);
+            if(commitData.date > config.since || config.since === 'always'){
+                commits.push(commitData);
+            }
         });
 
         history.on('end', function() {
