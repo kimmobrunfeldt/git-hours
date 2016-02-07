@@ -1,6 +1,6 @@
 {
   "name": "git-hours",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Estimate time spent on a git repository",
   "main": "./src/index.js",
   "bin": {
@@ -29,7 +29,7 @@
     "commander": "^2.2.0",
     "lodash": "^2.4.1",
     "moment": "^2.10.6",
-    "nodegit": "^0.4.1"
+    "nodegit": "^0.11.0"
   },
   "devDependencies": {
     "eslint": "^1.5.1",
