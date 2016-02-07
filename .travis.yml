@@ -9,3 +9,9 @@ script:
 notifications:
   email:
   - kimmobrunfeldt+git-hours@gmail.com
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - libstdc++-4.9-dev
