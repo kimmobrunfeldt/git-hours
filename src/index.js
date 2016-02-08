@@ -5,7 +5,6 @@ var git = require('nodegit');
 var program = require('commander');
 var _ = require('lodash');
 var moment = require('moment');
-var exec = Promise.promisify(require('child_process').exec);
 
 var DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -183,9 +182,12 @@ function estimateHours(dates) {
 function getCommits(gitPath) {
     return git.Repository.open(gitPath)
     .then(function(repo) {
-        var branchNames = getBranchNames(gitPath);
+        var allReferences = getAllReferences(repo);
 
-        return Promise.map(branchNames, function(branchName) {
+        return Promise.filter(allReferences, function(reference) {
+            return reference.match(/refs\/heads\/.*/);
+        })
+        .map(function(branchName) {
             return getBranchLatestCommit(repo, branchName);
         })
         .map(function(branchLatestCommit) {
@@ -209,21 +211,8 @@ function getCommits(gitPath) {
     });
 }
 
-function getBranchNames(gitPath) {
-    var cmd = "git branch --no-color | awk -F ' +' '! /\\(no branch\\)/ {print $2}'";
-    return new Promise(function(resolve, reject) {
-        exec(cmd, {cwd: gitPath}, function(err, stdout, stderr) {
-            if (err) {
-                reject(err);
-            }
-
-            resolve(stdout
-                    .split('\n')
-                    .filter(function(e) { return e; })  // Remove empty
-                    .map(function(str) { return str.trim(); })  // Trim whitespace
-            );
-        });
-    });
+function getAllReferences(repo) {
+    return repo.getReferenceNames(git.Reference.TYPE.LISTALL);
 }
 
 function getBranchLatestCommit(repo, branchName) {
