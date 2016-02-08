@@ -5,6 +5,7 @@ var git = require('nodegit');
 var program = require('commander');
 var _ = require('lodash');
 var moment = require('moment');
+var fs = require('fs');
 
 var DATE_FORMAT = 'YYYY-MM-DD';
 
@@ -21,6 +22,8 @@ var config = {
 };
 
 function main() {
+    exitIfShallow();
+
     parseArgs();
     config = mergeDefaultsWithArgs(config);
     config.since = parseSinceDate(config.since);
@@ -59,6 +62,14 @@ function main() {
     }).catch(function(e) {
         console.error(e.stack);
     });
+}
+
+function exitIfShallow() {
+    if (fs.existsSync(".git/shallow")) {
+        console.log("Cannot analyze shallow copies!");
+        console.log("Please run git fetch --unshallow before continuing!");
+        process.exit(1);
+    }
 }
 
 function parseArgs() {
