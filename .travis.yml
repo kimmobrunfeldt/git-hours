@@ -2,6 +2,8 @@ language: node_js
 node_js:
   - '0.12'
 sudo: false
+git:
+  depth: 1000000
 before_script:
   - npm install -g nodegit
 script:
