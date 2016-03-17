@@ -18,7 +18,8 @@ var config = {
     firstCommitAdditionInMinutes: 2 * 60,
 
     // Include commits since time x
-    since: 'always'
+    since: 'always',
+    until: 'always'
 };
 
 function main() {
@@ -27,6 +28,7 @@ function main() {
     parseArgs();
     config = mergeDefaultsWithArgs(config);
     config.since = parseSinceDate(config.since);
+    config.until = parseUntilDate(config.until);
 
     getCommits('.').then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
@@ -97,6 +99,12 @@ function parseArgs() {
             'Analyze data since certain date.' +
             ' [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: ' + config.since,
             String
+        )
+        .option(
+            '-u, --until [until-certain-date]',
+            'Analyze data until certain date.' +
+            ' [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: ' + config.until,
+            String
         );
 
     program.on('--help', function() {
@@ -131,8 +139,8 @@ function parseArgs() {
     program.parse(process.argv);
 }
 
-function parseSinceDate(since) {
-    switch (since) {
+function parseInputDate(inputDate) {
+    switch (inputDate) {
         case 'today':
             return moment().startOf('day');
         case 'yesterday':
@@ -145,16 +153,24 @@ function parseSinceDate(since) {
             return 'always';
         default:
             // XXX: Moment tries to parse anything, results might be weird
-            return moment(since, DATE_FORMAT);
+            return moment(inputDate, DATE_FORMAT);
     }
+}
+function parseSinceDate(since) {
+    return parseInputDate(since);
+}
+function parseUntilDate(until) {
+    return parseInputDate(until);
 }
 
 function mergeDefaultsWithArgs(conf) {
+
     return {
         range: program.range,
         maxCommitDiffInMinutes: program.maxCommitDiff || conf.maxCommitDiffInMinutes,
         firstCommitAdditionInMinutes: program.firstCommitAdd || conf.firstCommitAdditionInMinutes,
-        since: program.since || conf.since
+        since: program.since || conf.since,
+        until: program.until || conf.until
     };
 }
 
@@ -253,8 +269,23 @@ function getBranchCommits(branchLatestCommit) {
                 author: author
             };
 
+            var isValidSince = true;
             var sinceAlways = config.since === 'always' || !config.since;
             if (sinceAlways || moment(commitData.date.toISOString()).isAfter(config.since)) {
+                isValidSince = true;
+            } else {
+                isValidSince = false;
+            }
+
+            var isValidUntil = true;
+            var untilAlways = config.until === 'always' || !config.until;
+            if (untilAlways || moment(commitData.date.toISOString()).isBefore(config.until)) {
+                isValidUntil = true;
+            } else {
+                isValidUntil = false;
+            }
+
+            if (isValidSince && isValidUntil) {
                 commits.push(commitData);
             }
         });
