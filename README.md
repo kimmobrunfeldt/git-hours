@@ -27,19 +27,15 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 
     $ npm install -g git-hours
 
-**WARNING: Does not work with node 4.0! See [this issue](https://github.com/nodegit/nodegit/issues/723)**
+Has been tested and works with node 0.12, 4.x, 5.x versions. **Do not use node version
+below 0.12**.
 
-**NOTE: Use node version >=0.12.x.** *You can try to get nodegit working
-with older versions too but 0.12.x was the easiest. With older node versions,
-you might need to `npm install -g nodegit` too.*
+**NOTE:** If for some reason `git hours` won't work, try to `npm install -g nodegit`.
 
 `git-hours` depends on [nodegit](https://github.com/nodegit/nodegit).
 It might be a bit tricky to install. If installing git-hours fails for some
 reason, probably it was because nodegit couldn't be installed.
 Check [their documentation](https://github.com/nodegit/nodegit#getting-started) for troubleshooting.
-
-*Nodegit library has been a bit unstable and it might crash randomly.
-They have fixed a lot of issues lately though.*
 
 If the installation is too troublesome, you can try to [install with Vagrant](#install-with-vagrant). It should work out of the box once you get the Vagrant
 correctly installed to your machine.
