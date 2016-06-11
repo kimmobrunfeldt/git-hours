@@ -16,9 +16,12 @@ notifications:
   email:
   - kimmobrunfeldt+git-hours@gmail.com
 
+env:
+  - CXX=g++-4.8
+
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - libstdc++-4.9-dev
+      - g++-4.8
