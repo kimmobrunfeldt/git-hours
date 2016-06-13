@@ -27,7 +27,7 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 
     $ npm install -g git-hours
 
-Has been tested and works with node 0.12, 4.x, 5.x versions. **Do not use node version
+Has been tested and works with node 0.12, 4.x, 5.x, 6.x versions. **Do not use node version
 below 0.12**.
 
 **NOTE:** If for some reason `git hours` won't work, try to `npm install -g nodegit`.
