@@ -162,3 +162,11 @@ system by running:
 $ exit
 $ vagrant destroy -f
 ```
+
+## Run with docker
+
+Install [docker](http://www.docker.com/) and run the following command inside the git repo you want to analyze:
+```
+docker run --rm -v $(pwd):/code khor/git-hours
+```
+It mounts the current directory (pwd) inside the docker container and runs `git hours` on it.
