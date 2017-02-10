@@ -19,7 +19,8 @@ var config = {
 
     // Include commits since time x
     since: 'always',
-    until: 'always'
+    until: 'always',
+    branch: null
 };
 
 function main() {
@@ -30,7 +31,7 @@ function main() {
     config.since = parseSinceDate(config.since);
     config.until = parseUntilDate(config.until);
 
-    getCommits('.').then(function(commits) {
+    getCommits('.', config.branch).then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
             return commit.author.email || 'unknown';
         });
@@ -105,6 +106,11 @@ function parseArgs() {
             'Analyze data until certain date.' +
             ' [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: ' + config.until,
             String
+        )
+        .option(
+            '-b, --branch [branch name]',
+            'Analyze only data on the specified branch. Default: ' + config.branch,
+            String
         );
 
     program.on('--help', function() {
@@ -131,6 +137,10 @@ function parseArgs() {
         console.log('   - Estimate hours work in repository since 2015-01-31');
         console.log('');
         console.log('       $ git hours --since 2015-01-31');
+        console.log('');
+        console.log('   - Estimate hours work in repository on the "develop" branch');
+        console.log('');
+        console.log('       $ git hours --branch develop');
         console.log('');
         console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
@@ -170,7 +180,8 @@ function mergeDefaultsWithArgs(conf) {
         maxCommitDiffInMinutes: program.maxCommitDiff || conf.maxCommitDiffInMinutes,
         firstCommitAdditionInMinutes: program.firstCommitAdd || conf.firstCommitAdditionInMinutes,
         since: program.since || conf.since,
-        until: program.until || conf.until
+        until: program.until || conf.until,
+        branch: program.branch || conf.branch
     };
 }
 
@@ -206,15 +217,23 @@ function estimateHours(dates) {
 }
 
 // Promisify nodegit's API of getting all commits in repository
-function getCommits(gitPath) {
+function getCommits(gitPath, branch) {
     return git.Repository.open(gitPath)
     .then(function(repo) {
         var allReferences = getAllReferences(repo);
 
-        return Promise.filter(allReferences, function(reference) {
-            return reference.match(/refs\/heads\/.*/);
-        })
-        .map(function(branchName) {
+        if (branch) {
+            filterPromise = Promise.filter(allReferences, function(reference) {
+                return (reference == ('refs/heads/' + branch));
+            });
+        }
+        else {
+            filterPromise = Promise.filter(allReferences, function(reference) {
+                return reference.match(/refs\/heads\/.*/);
+            });
+        }
+
+        return filterPromise.map(function(branchName) {
             return getBranchLatestCommit(repo, branchName);
         })
         .map(function(branchLatestCommit) {
