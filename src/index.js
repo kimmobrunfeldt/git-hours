@@ -108,7 +108,7 @@ function parseArgs() {
             String
         )
         .option(
-            '-b, --branch [branch name]',
+            '-b, --branch [branch-name]',
             'Analyze only data on the specified branch. Default: ' + config.branch,
             String
         );
@@ -138,9 +138,9 @@ function parseArgs() {
         console.log('');
         console.log('       $ git hours --since 2015-01-31');
         console.log('');
-        console.log('   - Estimate hours work in repository on the "develop" branch');
+        console.log('   - Estimate hours work in repository on the "master" branch');
         console.log('');
-        console.log('       $ git hours --branch develop');
+        console.log('       $ git hours --branch master');
         console.log('');
         console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
