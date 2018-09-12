@@ -230,7 +230,6 @@ function parseEmailAlias(alias) {
 }
 
 function mergeDefaultsWithArgs(conf) {
-    console.log(program.mergeRequest !== undefined ? !!program.mergeRequest : conf.mergeRequest)
     return {
         range: program.range,
         maxCommitDiffInMinutes: program.maxCommitDiff || conf.maxCommitDiffInMinutes,
