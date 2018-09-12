@@ -30,7 +30,9 @@ var config = {
     // Aliases of emails for grouping the same activity as one person
     emailAliases: {
         "linus@torvalds.com": "linus@linux.com"
-    }
+    },
+    
+    branch: null
 };
 
 function main() {
@@ -55,7 +57,7 @@ function main() {
         }
     }
 
-    getCommits(config.gitPath).then(function(commits) {
+    getCommits(config.gitPath, config.branch).then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
             var email = commit.author.email || 'unknown'
             if (config.emailAliases !== undefined && config.emailAliases[email] !== undefined) {
@@ -155,6 +157,11 @@ function parseArgs() {
             'Git repository to analyze.' +
             ' Default: ' + config.gitPath,
             String
+        )
+        .option(
+            '-b, --branch [branch-name]',
+            'Analyze only data on the specified branch. Default: ' + config.branch,
+            String
         );
 
     program.on('--help', function() {
@@ -181,6 +188,10 @@ function parseArgs() {
         console.log('   - Estimate hours work in repository since 2015-01-31');
         console.log('');
         console.log('       $ git hours --since 2015-01-31');
+        console.log('');
+        console.log('   - Estimate hours work in repository on the "master" branch');
+        console.log('');
+        console.log('       $ git hours --branch master');
         console.log('');
         console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
@@ -237,7 +248,8 @@ function mergeDefaultsWithArgs(conf) {
         since: program.since || conf.since,
         until: program.until || conf.until,
         gitPath: program.path || conf.gitPath,
-        mergeRequest: program.mergeRequest !== undefined ? (program.mergeRequest == "true") : conf.mergeRequest
+        mergeRequest: program.mergeRequest !== undefined ? (program.mergeRequest == "true") : conf.mergeRequest,
+        branch: program.branch || conf.branch
     };
 }
 
@@ -273,15 +285,23 @@ function estimateHours(dates) {
 }
 
 // Promisify nodegit's API of getting all commits in repository
-function getCommits(gitPath) {
+function getCommits(gitPath, branch) {
     return git.Repository.open(gitPath)
     .then(function(repo) {
         var allReferences = getAllReferences(repo);
-        
-        return Promise.filter(allReferences, function(reference) {
-            return reference.match(/refs\/heads\/.*/);
-        })
-        .map(function(branchName) {
+
+        if (branch) {
+            filterPromise = Promise.filter(allReferences, function(reference) {
+                return (reference == ('refs/heads/' + branch));
+            });
+        }
+        else {
+            filterPromise = Promise.filter(allReferences, function(reference) {
+                return reference.match(/refs\/heads\/.*/);
+            });
+        }
+
+        return filterPromise.map(function(branchName) {
             return getBranchLatestCommit(repo, branchName);
         })
         .map(function(branchLatestCommit) {
