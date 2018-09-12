@@ -104,6 +104,7 @@ Help
       -u, --until [until-certain-date]           Analyze data until certain date. [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: always
       -m, --merge-request [false|true]           Include merge requests into calculation.  Default: true
       -p, --path [git-repo]                      Git repository to analyze. Default: .
+      -b, --branch [branch-name]                 Analyze only data on the specified branch. Default: all branches
 
     Examples:
 
@@ -126,6 +127,10 @@ Help
      - Estimate hours work in repository since 2015-01-31
 
        $ git hours --since 2015-01-31
+       
+    - Estimate hours work in repository on the "master" branch
+    
+       $ git hours --branch master
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
 
