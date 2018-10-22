@@ -91,7 +91,7 @@ In root of a git repository run:
 
 Help
 
-    Usage: githours [options]
+    Usage: git hours [options]
 
     Options:
 
@@ -100,6 +100,11 @@ Help
       -d, --max-commit-diff [max-commit-diff]    maximum difference in minutes between commits counted to one session. Default: 120
       -a, --first-commit-add [first-commit-add]  how many minutes first commit of session should add to total. Default: 120
       -s, --since [since-certain-date]           Analyze data since certain date. [always|yesterday|tonight|lastweek|yyyy-mm-dd] Default: always'
+      -e, --email [emailOther=emailMain]         Group person by email address. Default: none
+      -u, --until [until-certain-date]           Analyze data until certain date. [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: always
+      -m, --merge-request [false|true]           Include merge requests into calculation.  Default: true
+      -p, --path [git-repo]                      Git repository to analyze. Default: .
+      -b, --branch [branch-name]                 Analyze only data on the specified branch. Default: all branches
 
     Examples:
 
@@ -122,6 +127,10 @@ Help
      - Estimate hours work in repository since 2015-01-31
 
        $ git hours --since 2015-01-31
+       
+    - Estimate hours work in repository on the "master" branch
+    
+       $ git hours --branch master
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
 

@@ -19,7 +19,20 @@ var config = {
 
     // Include commits since time x
     since: 'always',
-    until: 'always'
+    until: 'always',
+
+    // Include merge requests
+    mergeRequest: true,
+
+    // Git repo
+    gitPath: '.',
+
+    // Aliases of emails for grouping the same activity as one person
+    emailAliases: {
+        "linus@torvalds.com": "linus@linux.com"
+    },
+    
+    branch: null
 };
 
 function main() {
@@ -30,10 +43,29 @@ function main() {
     config.since = parseSinceDate(config.since);
     config.until = parseUntilDate(config.until);
 
-    getCommits('.').then(function(commits) {
+    // Poor man`s multiple args support
+    // https://github.com/tj/commander.js/issues/531
+    for (var i = 0; i < process.argv.length; i++) {
+        var k = process.argv[i];
+        var n = i <= process.argv.length - 1 ? process.argv[i + 1] : undefined;
+        if (k == "-e" || k == "--email") {
+            parseEmailAlias(n);
+        } else
+        if (k.startsWith("--email=")) {
+            n = k.substring(k.indexOf("=") + 1)
+            parseEmailAlias(n);
+        }
+    }
+
+    getCommits(config.gitPath, config.branch).then(function(commits) {
         var commitsByEmail = _.groupBy(commits, function(commit) {
-            return commit.author.email || 'unknown';
+            var email = commit.author.email || 'unknown'
+            if (config.emailAliases !== undefined && config.emailAliases[email] !== undefined) {
+                email = config.emailAliases[email]
+            }
+            return email;
         });
+
         var authorWorks = _.map(commitsByEmail, function(authorCommits, authorEmail) {
             return {
                 email: authorEmail,
@@ -48,6 +80,7 @@ function main() {
         // making the output easier to read, so it doesn't matter if it
         // isn't sorted in some cases.
         var sortedWork = {};
+
         _.each(_.sortBy(authorWorks, 'hours'), function(authorWork) {
             sortedWork[authorWork.email] = _.omit(authorWork, 'email');
         });
@@ -55,6 +88,7 @@ function main() {
         var totalHours = _.reduce(sortedWork, function(sum, authorWork) {
             return sum + authorWork.hours;
         }, 0);
+
         sortedWork.total = {
             hours: totalHours,
             commits: commits.length
@@ -101,9 +135,32 @@ function parseArgs() {
             String
         )
         .option(
+            '-e, --email [emailOther=emailMain]',
+            'Group person by email address.' +
+            ' Default: none',
+            String
+        )
+        .option(
             '-u, --until [until-certain-date]',
             'Analyze data until certain date.' +
             ' [always|yesterday|today|lastweek|thisweek|yyyy-mm-dd] Default: ' + config.until,
+            String
+        )
+        .option(
+            '-m, --merge-request [false|true]',
+            'Include merge requests into calculation. ' + 
+            ' Default: ' + config.mergeRequest,
+            String
+        )
+        .option(
+            '-p, --path [git-repo]',
+            'Git repository to analyze.' +
+            ' Default: ' + config.gitPath,
+            String
+        )
+        .option(
+            '-b, --branch [branch-name]',
+            'Analyze only data on the specified branch. Default: ' + config.branch,
             String
         );
 
@@ -132,6 +189,10 @@ function parseArgs() {
         console.log('');
         console.log('       $ git hours --since 2015-01-31');
         console.log('');
+        console.log('   - Estimate hours work in repository on the "master" branch');
+        console.log('');
+        console.log('       $ git hours --branch master');
+        console.log('');
         console.log('  For more details, visit https://github.com/kimmobrunfeldt/git-hours');
         console.log('');
     });
@@ -156,21 +217,39 @@ function parseInputDate(inputDate) {
             return moment(inputDate, DATE_FORMAT);
     }
 }
+
 function parseSinceDate(since) {
     return parseInputDate(since);
 }
+
 function parseUntilDate(until) {
     return parseInputDate(until);
 }
 
-function mergeDefaultsWithArgs(conf) {
+function parseEmailAlias(alias) {
+    if (alias.indexOf("=") > 0) {
+        var email = alias.substring(0, alias.indexOf("=")).trim();
+        var alias = alias.substring(alias.indexOf("=") + 1).trim();
+        // console.warn("Adding alias " + email + " -> " + alias);
+        if (config.emailAliases === undefined) {
+            config.emailAliases = {}
+        }
+        config.emailAliases[email] = alias
+    } else {
+        console.error("ERROR: Invalid alias: " + alias);
+    }
+}
 
+function mergeDefaultsWithArgs(conf) {
     return {
         range: program.range,
         maxCommitDiffInMinutes: program.maxCommitDiff || conf.maxCommitDiffInMinutes,
         firstCommitAdditionInMinutes: program.firstCommitAdd || conf.firstCommitAdditionInMinutes,
         since: program.since || conf.since,
-        until: program.until || conf.until
+        until: program.until || conf.until,
+        gitPath: program.path || conf.gitPath,
+        mergeRequest: program.mergeRequest !== undefined ? (program.mergeRequest == "true") : conf.mergeRequest,
+        branch: program.branch || conf.branch
     };
 }
 
@@ -206,15 +285,23 @@ function estimateHours(dates) {
 }
 
 // Promisify nodegit's API of getting all commits in repository
-function getCommits(gitPath) {
+function getCommits(gitPath, branch) {
     return git.Repository.open(gitPath)
     .then(function(repo) {
         var allReferences = getAllReferences(repo);
 
-        return Promise.filter(allReferences, function(reference) {
-            return reference.match(/refs\/heads\/.*/);
-        })
-        .map(function(branchName) {
+        if (branch) {
+            filterPromise = Promise.filter(allReferences, function(reference) {
+                return (reference == ('refs/heads/' + branch));
+            });
+        }
+        else {
+            filterPromise = Promise.filter(allReferences, function(reference) {
+                return reference.match(/refs\/heads\/.*/);
+            });
+        }
+
+        return filterPromise.map(function(branchName) {
             return getBranchLatestCommit(repo, branchName);
         })
         .map(function(branchLatestCommit) {
@@ -233,7 +320,14 @@ function getCommits(gitPath) {
                 return item.sha;
             });
 
-            return uniqueCommits;
+            return uniqueCommits.filter(function (commit) {
+                // Exclude all commits starting with "Merge ..."
+                if (!config.mergeRequest && commit.message.startsWith("Merge ")) {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
         });
     });
 }
