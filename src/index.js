@@ -31,7 +31,6 @@ var config = {
     emailAliases: {
         "linus@torvalds.com": "linus@linux.com"
     },
-    
     branch: null
 };
 
@@ -148,7 +147,7 @@ function parseArgs() {
         )
         .option(
             '-m, --merge-request [false|true]',
-            'Include merge requests into calculation. ' + 
+            'Include merge requests into calculation. ' +
             ' Default: ' + config.mergeRequest,
             String
         )
@@ -248,7 +247,8 @@ function mergeDefaultsWithArgs(conf) {
         since: program.since || conf.since,
         until: program.until || conf.until,
         gitPath: program.path || conf.gitPath,
-        mergeRequest: program.mergeRequest !== undefined ? (program.mergeRequest == "true") : conf.mergeRequest,
+        mergeRequest: program.mergeRequest !== undefined ? (program.mergeRequest == "true") :
+            conf.mergeRequest,
         branch: program.branch || conf.branch
     };
 }
@@ -320,7 +320,7 @@ function getCommits(gitPath, branch) {
                 return item.sha;
             });
 
-            return uniqueCommits.filter(function (commit) {
+            return uniqueCommits.filter(function(commit) {
                 // Exclude all commits starting with "Merge ..."
                 if (!config.mergeRequest && commit.message.startsWith("Merge ")) {
                     return false;
