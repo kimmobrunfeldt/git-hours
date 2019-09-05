@@ -13,7 +13,9 @@ git:
   depth: 1000000
 
 script:
-  - npm run ci
+  - npm run jscs
+  - npm run eslint
+  - npm run test
 
 notifications:
   email:
