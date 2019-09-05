@@ -333,7 +333,7 @@ function getCommits(gitPath, branch) {
 }
 
 function getAllReferences(repo) {
-    return repo.getReferenceNames(git.Reference.TYPE.LISTALL);
+    return repo.getReferenceNames(git.Reference.TYPE.ALL);
 }
 
 function getBranchLatestCommit(repo, branchName) {
