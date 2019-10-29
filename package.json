@@ -29,7 +29,7 @@
     "commander": "^2.2.0",
     "lodash": "^2.4.1",
     "moment": "^2.10.6",
-    "nodegit": "^0.22.2"
+    "nodegit": "^0.25.1"
   },
   "devDependencies": {
     "eslint": "^1.5.1",
@@ -38,7 +38,6 @@
     "releasor": "^0.1.3"
   },
   "scripts": {
-    "ci": "./tools/ci.sh",
     "test": "mocha",
     "eslint": "eslint --ext .js ./src ./test",
     "jscs": "jscs ./src ./test"
