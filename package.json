@@ -29,7 +29,7 @@
     "commander": "^2.2.0",
     "lodash": "^2.4.1",
     "moment": "^2.10.6",
-    "nodegit": "^0.25.1"
+    "nodegit": "^0.26.2"
   },
   "devDependencies": {
     "eslint": "^1.5.1",
