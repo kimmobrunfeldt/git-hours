@@ -1,6 +1,6 @@
 {
   "name": "git-hours",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Estimate time spent on a git repository",
   "main": "./src/index.js",
   "bin": {
@@ -25,21 +25,26 @@
   },
   "homepage": "https://github.com/kimmobrunfeldt/git-hours",
   "dependencies": {
-    "bluebird": "^2.1.3",
-    "commander": "^2.2.0",
-    "lodash": "^2.4.1",
+    "bluebird": "^3.7.2",
+    "commander": "^8.0.0",
+    "lodash": "^4.17.21",
     "moment": "^2.10.6",
-    "nodegit": "^0.26.2"
+    "nodegit": "^0.27.0"
   },
   "devDependencies": {
-    "eslint": "^1.5.1",
-    "jscs": "^2.1.1",
-    "mocha": "^2.3.3",
-    "releasor": "^0.1.3"
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
+    "mocha": "^9.0.2",
+    "nodemon": "^2.0.9",
+    "releasor": "^1.2.1"
   },
   "scripts": {
-    "test": "mocha",
-    "eslint": "eslint --ext .js ./src ./test",
-    "jscs": "jscs ./src ./test"
+    "dev": "npx nodemon --exec 'npm run test && npm run lint'",
+    "test": "npx mocha -R spec",
+    "lint": "npx eslint --ext js ."
+  },
+  "engines": {
+    "node": "^12.22.3"
   }
 }

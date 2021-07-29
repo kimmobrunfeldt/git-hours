@@ -29,3 +29,6 @@ node_modules
 
 # Vagrant directory
 .vagrant
+
+# Vim
+*.swp
