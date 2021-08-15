@@ -1,4 +1,4 @@
-[![Status badge](https://github.com/kimmobrunfeldt/git-hours/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kimmobrunfeldt/git-hours/actions?query=branch%3Amain)
+[![Status badge](https://github.com/kimmobrunfeldt/git-hours/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kimmobrunfeldt/git-hours/actions?query=branch%3Amaster)
 
 # git-hours
 
