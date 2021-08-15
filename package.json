@@ -45,6 +45,6 @@
     "lint": "npx eslint --ext js ."
   },
   "engines": {
-    "node": "^12.22.3"
+    "node": "^14.x"
   }
 }
