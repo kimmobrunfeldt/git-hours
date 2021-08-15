@@ -34,9 +34,6 @@ It might be a bit tricky to install. If installing git-hours fails for some
 reason, probably it was because nodegit couldn't be installed.
 Check [their documentation](https://github.com/nodegit/nodegit#getting-started) for troubleshooting.
 
-If the installation is too troublesome, you can try to [install with Vagrant](#install-with-vagrant). It should work out of the box once you get the Vagrant
-correctly installed to your machine.
-
 ## How it works
 
 The algorithm for estimating hours is quite simple. For each author in the commit history, do the following:
@@ -131,48 +128,3 @@ Help
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
 
-
-## Install with Vagrant
-
-If you prefer to use vagrant, here's how:
-
-[Vagrant](https://docs.vagrantup.com/v2/getting-started/) can be used to automatically
-set up a disposable Virtual Machine with the required environment and install the
-program.
-
-```
-$ git clone https://github.com/kimmobrunfeldt/git-hours
-$ cd git-hours
-$ vagrant up && vagrant ssh
-```
-
-And that's it, you can now test out git-hours. For example:
-
-```
-$ git clone https://github.com/twbs/bootstrap
-$ cd bootstrap
-$ git hours
-{
-  "total": {
-    "hours": 6417,
-    "commits": 9779
-  }
-}
-```
-
-Then when you are done playing around you can cleanly
-[remove](https://docs.vagrantup.com/v2/cli/destroy.html) the vm from your
-system by running:
-
-```
-$ exit
-$ vagrant destroy -f
-```
-
-## Run with docker
-
-Install [docker](http://www.docker.com/) and run the following command inside the git repo you want to analyze:
-```
-docker run --rm -v $(pwd):/code khor/git-hours
-```
-It mounts the current directory (pwd) inside the docker container and runs `git hours` on it.
