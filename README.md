@@ -1,6 +1,6 @@
-# Git hours
+[![Status badge](https://github.com/kimmobrunfeldt/git-hours/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/kimmobrunfeldt/git-hours/actions?query=branch%3Amain)
 
-[![Build Status](https://travis-ci.org/kimmobrunfeldt/git-hours.svg)](https://travis-ci.org/kimmobrunfeldt/git-hours)
+# git-hours
 
 Estimate time spent on a git repository.
 
@@ -26,9 +26,6 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 ## Install
 
     $ npm install -g git-hours
-
-Has been tested and works with node 0.12, 4.x, 5.x, 6.x versions. **Do not use node version
-below 0.12**.
 
 **NOTE:** If for some reason `git hours` won't work, try to `npm install -g nodegit`.
 
@@ -127,9 +124,9 @@ Help
      - Estimate hours work in repository since 2015-01-31
 
        $ git hours --since 2015-01-31
-       
+
     - Estimate hours work in repository on the "master" branch
-    
+
        $ git hours --branch master
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
