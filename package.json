@@ -1,12 +1,14 @@
 {
   "name": "git-hours",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Estimate time spent on a git repository",
   "main": "./src/index.js",
   "bin": {
     "git-hours": "./src/index.js"
   },
-  "files": ["src/**/*"],
+  "files": [
+    "src/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kimmobrunfeldt/git-hours.git"
