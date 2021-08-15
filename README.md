@@ -7,7 +7,7 @@ Estimate time spent on a git repository.
 **For example time spent on [Twitter's Bootstrap](https://github.com/twbs/bootstrap)**
 
 ```javascript
-➜  bootstrap git:(master) git hours
+➜  bootstrap git:(master) git-hours
 {
 
   ...
@@ -27,7 +27,7 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 
     $ npm install -g git-hours
 
-**NOTE:** If for some reason `git hours` won't work, try to `npm install -g nodegit`.
+**NOTE:** If for some reason `git-hours` won't work, try to `npm install -g nodegit`.
 
 `git-hours` depends on [nodegit](https://github.com/nodegit/nodegit).
 It might be a bit tricky to install. If installing git-hours fails for some
@@ -79,13 +79,13 @@ The algorithm in [~30 lines of code](https://github.com/kimmobrunfeldt/git-hours
 
 In root of a git repository run:
 
-    $ git hours
+    $ git-hours
 
 **Note: repository is not detected if you are not in the root of repository!**
 
 Help
 
-    Usage: git hours [options]
+    Usage: git-hours [options]
 
     Options:
 
@@ -104,27 +104,27 @@ Help
 
      - Estimate hours of project
 
-         $ git hours
+         $ git-hours
 
      - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits
 
-         $ git hours --max-commit-diff 240
+         $ git-hours --max-commit-diff 240
 
      - Estimate hours in repository where developer works 5 hours before first commit in day
 
-         $ git hours --first-commit-add 300
+         $ git-hours --first-commit-add 300
 
      - Estimate hours work in repository since yesterday
 
-       $ git hours --since yesterday
+       $ git-hours --since yesterday
 
      - Estimate hours work in repository since 2015-01-31
 
-       $ git hours --since 2015-01-31
+       $ git-hours --since 2015-01-31
 
     - Estimate hours work in repository on the "master" branch
 
-       $ git hours --branch master
+       $ git-hours --branch master
 
     For more details, visit https://github.com/kimmobrunfeldt/git-hours
 

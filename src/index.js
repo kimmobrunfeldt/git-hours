@@ -261,17 +261,17 @@ function parseArgs() {
     console.log([
       '  Examples:',
       '   - Estimate hours of project',
-      '       $ git hours',
+      '       $ git-hours',
       '   - Estimate hours in repository where developers commit more seldom: they might have 4h(240min) pause between commits',
-      '       $ git hours --max-commit-diff 240',
+      '       $ git-hours --max-commit-diff 240',
       '   - Estimate hours in repository where developer works 5 hours before first commit in day',
-      '       $ git hours --first-commit-add 300',
+      '       $ git-hours --first-commit-add 300',
       '   - Estimate hours work in repository since yesterday',
-      '       $ git hours --since yesterday',
+      '       $ git-hours --since yesterday',
       '   - Estimate hours work in repository since 2015-01-31',
-      '       $ git hours --since 2015-01-31',
+      '       $ git-hours --since 2015-01-31',
       '   - Estimate hours work in repository on the "master" branch',
-      '       $ git hours --branch master',
+      '       $ git-hours --branch master',
       '  For more details, visit https://github.com/kimmobrunfeldt/git-hours',
     ].join('\n\n'));
   });
