@@ -170,15 +170,17 @@ function parseEmailAlias(value) {
 }
 
 function mergeDefaultsWithArgs(conf) {
+
+  const options = program.opts();
   return {
-    range: program.range,
-    maxCommitDiffInMinutes: program.maxCommitDiff || conf.maxCommitDiffInMinutes,
-    firstCommitAdditionInMinutes: program.firstCommitAdd || conf.firstCommitAdditionInMinutes,
-    since: program.since || conf.since,
-    until: program.until || conf.until,
-    gitPath: program.path || conf.gitPath,
-    mergeRequest: program.mergeRequest !== undefined ? (program.mergeRequest === 'true') : conf.mergeRequest,
-    branch: program.branch || conf.branch,
+    range: options.range,
+    maxCommitDiffInMinutes: options.maxCommitDiff || conf.maxCommitDiffInMinutes,
+    firstCommitAdditionInMinutes: options.firstCommitAdd || conf.firstCommitAdditionInMinutes,
+    since: options.since || conf.since,
+    until: options.until || conf.until,
+    gitPath: options.path || conf.gitPath,
+    mergeRequest: options.mergeRequest !== undefined ? (options.mergeRequest === 'true') : conf.mergeRequest,
+    branch: options.branch || conf.branch,
   };
 }
 
