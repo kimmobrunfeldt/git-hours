@@ -4,6 +4,8 @@
 
 Estimate time spent on a git repository.
 
+**NOTE:** This revamped version uses native OS git so `nodegit` is no longer required!
+
 **For example time spent on [Twitter's Bootstrap](https://github.com/twbs/bootstrap)**
 
 ```javascript
@@ -27,12 +29,7 @@ From a person working 8 hours per day, it would take more than 3 years to build 
 
     $ npm install -g git-hours
 
-**NOTE:** If for some reason `git-hours` won't work, try to `npm install -g nodegit`.
 
-`git-hours` depends on [nodegit](https://github.com/nodegit/nodegit).
-It might be a bit tricky to install. If installing git-hours fails for some
-reason, probably it was because nodegit couldn't be installed.
-Check [their documentation](https://github.com/nodegit/nodegit#getting-started) for troubleshooting.
 
 ## How it works
 
