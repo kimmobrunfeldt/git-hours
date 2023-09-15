@@ -81,7 +81,7 @@ function getGitOptions() {
 		"--reverse",
 		!sinceAlways ? `--since=${config.since.format(DATE_FORMAT)}` : '',
 		!untilAlways ? `--until=${config.until.format(DATE_FORMAT)}` : '',
-        '--pretty=format:{"sha":"%H","date":"%ad","message":"%s","author":{"name":"%an","email":"%ae"}}',
+        '--pretty=format:{"sha":"%H","date":"%ad","message":"%f","author":{"name":"%an","email":"%ae"}}',
 	];
 	
 	return params.filter((item) => item); // filtering false
