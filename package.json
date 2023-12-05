@@ -1,6 +1,6 @@
 {
   "name": "git-hours",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Estimate time spent on a git repository",
   "main": "./src/index.js",
   "bin": {
@@ -31,8 +31,7 @@
     "bluebird": "^3.7.2",
     "commander": "^8.0.0",
     "lodash": "^4.17.21",
-    "moment": "^2.10.6",
-    "nodegit": "^0.27.0"
+    "moment": "^2.10.6"
   },
   "devDependencies": {
     "eslint": "^7.30.0",
@@ -48,6 +47,6 @@
     "lint": "npx eslint --ext js ."
   },
   "engines": {
-    "node": "^14.x"
+    "node": ">=14.x"
   }
 }

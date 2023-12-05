@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 const Promise = require('bluebird');
+const childProcess = require('child_process');
 const _ = require('lodash');
 const fs = require('fs');
-const git = require('nodegit');
 const moment = require('moment');
 const program = require('commander');
 
@@ -62,98 +62,73 @@ function estimateHours(dates) {
   return Math.round(totalHours);
 }
 
-function getBranchCommits(branchLatestCommit) {
-  return new Promise((resolve, reject) => {
-    const history = branchLatestCommit.history();
-    const commits = [];
-
-    history.on('commit', (commit) => {
-      let author = null;
-      if (!_.isNull(commit.author())) {
-        author = {
-          name: commit.author().name(),
-          email: commit.author().email(),
-        };
-      }
-
-      const commitData = {
-        sha: commit.sha(),
-        date: commit.date(),
-        message: commit.message(),
-        author,
-      };
-
-      let isValidSince = true;
-      const sinceAlways = config.since === 'always' || !config.since;
-      if (sinceAlways || moment(commitData.date.toISOString()).isAfter(config.since)) {
-        isValidSince = true;
-      } else {
-        isValidSince = false;
-      }
-
-      let isValidUntil = true;
-      const untilAlways = config.until === 'always' || !config.until;
-      if (untilAlways || moment(commitData.date.toISOString()).isBefore(config.until)) {
-        isValidUntil = true;
-      } else {
-        isValidUntil = false;
-      }
-
-      if (isValidSince && isValidUntil) {
-        commits.push(commitData);
-      }
-    });
-    history.on('end', () => resolve(commits));
-    history.on('error', reject);
-
-    // Start emitting events.
-    history.start();
-  });
+/**
+ * Prepares the git command before execution
+ *
+ * @return {String} Prepared command
+ */
+function getGitOptions() {
+	const sinceAlways = config.since === 'always' || !config.since;
+	const untilAlways = config.until === 'always' || !config.until;
+	
+	const params = [
+		//config.gitPath ? `-C ${config.gitPath}` : '',
+		"--no-pager",
+		"log",
+		config.mergeRequest ? '-m' : '',
+		config.branch ? config.branch : '',
+		"--date=iso-local",
+		"--reverse",
+		!sinceAlways ? `--since=${config.since.format(DATE_FORMAT)}` : '',
+		!untilAlways ? `--until=${config.until.format(DATE_FORMAT)}` : '',
+        '--pretty=format:{"sha":"%H","date":"%ad","message":"%f","author":{"name":"%an","email":"%ae"}}',
+	];
+	
+	return params.filter((item) => item); // filtering false
 }
 
-function getBranchLatestCommit(repo, branchName) {
-  return repo.getBranch(branchName).then((reference) => repo.getBranchCommit(reference.name()));
-}
+function getBranchCommits() {
+	return new Promise(function(resolve, reject) {
+        childProcess.execFile('git', getGitOptions(), (error, stdout, stderr) => {
+			// all commits array
+			let commits = [];
 
-function getAllReferences(repo) {
-  return repo.getReferenceNames(git.Reference.TYPE.ALL);
-}
-
-// Promisify nodegit's API of getting all commits in repository
-function getCommits(gitPath, branch) {
-  return git.Repository.open(gitPath)
-    .then((repo) => {
-      const allReferences = getAllReferences(repo);
-      let filterPromise;
-
-      if (branch) {
-        filterPromise = Promise.filter(allReferences, (reference) => (reference === `refs/heads/${branch}`));
-      } else {
-        filterPromise = Promise.filter(allReferences, (reference) => reference.match(/refs\/heads\/.*/));
-      }
-
-      return filterPromise.map((branchName) => getBranchLatestCommit(repo, branchName))
-        .map((branchLatestCommit) => getBranchCommits(branchLatestCommit))
-        .reduce((allCommits, branchCommits) => {
-          _.each(branchCommits, (commit) => {
-            allCommits.push(commit);
-          });
-
-          return allCommits;
-        }, [])
-        .then((commits) => {
-          // Multiple branches might share commits, so take unique
-          const uniqueCommits = _.uniq(commits, (item) => item.sha);
-
-          return uniqueCommits.filter((commit) => {
-            // Exclude all commits starting with "Merge ..."
-            if (!config.mergeRequest && commit.message.startsWith('Merge ')) {
-              return false;
+            if (error) {
+                reject(commits);
+                return;
             }
-            return true;
-          });
+
+			// convert string to json
+			let logs = stdout.toString().trim().split('\n');
+
+			// filtering empty
+			logs = logs.filter((item) => item);
+
+			logs.forEach((commit) => {
+				let item = JSON.parse(commit);
+				commits.push(item);
+			});
+
+            resolve(commits);
         });
     });
+}
+
+// Promisify Git Commits of getting all commits in repository
+function getCommits() {
+  return getBranchCommits()
+	.then((commits) => {
+	  // Multiple branches might share commits, so take unique
+	  const uniqueCommits = _.uniq(commits, (item) => item.sha);
+
+	  return uniqueCommits.filter((commit) => {
+		// Exclude all commits starting with "Merge ..."
+		if (!config.mergeRequest && commit.message.startsWith('Merge ')) {
+		  return false;
+		}
+		return true;
+	  });
+	});
 }
 
 function parseEmailAlias(value) {
@@ -170,7 +145,6 @@ function parseEmailAlias(value) {
 }
 
 function mergeDefaultsWithArgs(conf) {
-
   const options = program.opts();
   return {
     range: options.range,
@@ -310,7 +284,7 @@ function main() {
     }
   }
 
-  getCommits(config.gitPath, config.branch).then((commits) => {
+  getCommits().then((commits) => {
     const commitsByEmail = _.groupBy(commits, (commit) => {
       let email = commit.author.email || 'unknown';
       if (config.emailAliases !== undefined && config.emailAliases[email] !== undefined) {
